@@ -12,7 +12,7 @@ import swaggerUi from 'swagger-ui-express';
 import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
 import { dbConnection } from '@database';
 import { Routes } from '@interfaces/routes.interface';
-import { ErrorMiddleware } from '@middlewares/error.middleware';
+import { ErrorMiddleware } from '@/interfaces/middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 
 export class App {
@@ -51,7 +51,7 @@ export class App {
     }
 
     try {
-      await connect(dbConnection.url, dbConnection.options);
+      await connect(dbConnection.url);
       console.log('connection to db successfull');
     } catch (error) {
       throw new Error(error);

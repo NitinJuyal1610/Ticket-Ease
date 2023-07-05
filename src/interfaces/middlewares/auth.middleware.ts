@@ -28,7 +28,7 @@ export function AuthMiddleware(roles: string[]) {
           req.user = findUser;
           next();
         } else {
-          next(new HttpException(401, 'Wrong authentication token'));
+          next(new HttpException(401, 'Wrong authentication token or Not authorized'));
         }
       } else {
         next(new HttpException(404, 'Authentication token missing'));
