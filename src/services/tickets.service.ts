@@ -6,9 +6,10 @@ import { User } from '@/interfaces/users.interface';
 
 @Service()
 export class TicketsService {
-  public async findAllTickets(user: User, status: string, priority: string, category: string): Promise<Ticket[]> {
+  public async findAllTickets(user: User, status: string, priority: string, category: string, sortBy: string, sortOrder: string): Promise<Ticket[]> {
     try {
       const filter = {};
+      const sorter = {};
       let tickets = [];
       if (user.role === 'user') {
         filter['createdBy'] = user._id;
@@ -25,10 +26,10 @@ export class TicketsService {
       if (category) {
         filter['category'] = category;
       }
-      console.log(filter);
-
-      tickets = await TicketModel.find(filter);
-
+      if (sortBy) {
+        sorter[sortBy] = sortOrder;
+      }
+      tickets = await TicketModel.find(filter).sort(sorter);
       console.log('Retrieved tickets:', tickets);
       return tickets;
     } catch (error) {

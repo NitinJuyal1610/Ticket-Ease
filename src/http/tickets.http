@@ -3,7 +3,7 @@
 
 ###
 # Find All tickets
-GET {{ baseURL }}/tickets?category=Performance Problem
+GET {{ baseURL }}/tickets?sortBy=createdAt
 
 
 ###
@@ -24,11 +24,11 @@ Content-Type: application/json
 
 ###
 # Modify Ticket By Id
-PUT {{ baseURL }}/tickets/64a69836e7da8d9be90fbd44
+PUT {{ baseURL }}/tickets/64a6b75e757cdc08e425c391
 Content-Type: application/json
 
 {
-  "priority":"low"
+  "priority":"high"
 }
 
 # ###

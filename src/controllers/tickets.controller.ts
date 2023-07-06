@@ -8,9 +8,9 @@ export class TicketController {
   public ticket = Container.get(TicketsService);
   public getTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      const { status, priority, category } = req.query as RequestQuery;
+      const { status, priority, category, sortBy, sortOrder } = req.query as RequestQuery;
       console.log(status, priority, category);
-      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category);
+      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category, sortBy, sortOrder);
       res.status(201).json({ data: ticketsData, message: 'tickets' });
     } catch (error) {
       next(error);

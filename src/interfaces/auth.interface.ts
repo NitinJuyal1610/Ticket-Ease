@@ -18,4 +18,6 @@ export interface RequestQuery {
   status?: string;
   priority?: string;
   category?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
