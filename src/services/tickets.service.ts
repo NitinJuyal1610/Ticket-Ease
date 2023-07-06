@@ -15,4 +15,12 @@ export class TicketsService {
     const ticket = await TicketModel.create(ticketData);
     return ticket;
   }
+
+  public async getTicketById(ticketId: string): Promise<Ticket> {
+    const ticket = await TicketModel.findById(ticketId);
+    if (!ticket) {
+      throw new HttpException(404, 'Ticket not found');
+    }
+    return ticket;
+  }
 }

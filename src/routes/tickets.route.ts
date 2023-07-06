@@ -16,7 +16,7 @@ export class TicketRoute implements Routes {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTickets);
-    // this.router.get(`${this.path}/:id`, this.user.getUserById);
+    this.router.get(`${this.path}/:id`, this.ticket.getTicketById);
     this.router.post(`${this.path}`, AuthMiddleware(['user']), ValidationMiddleware(CreateTicketDto, true), this.ticket.createTicket);
     // this.router.put(`${this.path}/:id`, ValidationMiddleware(CreateUserDto, 'body', true), this.user.updateUser);
     // this.router.delete(`${this.path}/:id`, this.user.deleteUser);

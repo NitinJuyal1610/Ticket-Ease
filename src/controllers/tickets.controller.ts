@@ -26,4 +26,14 @@ export class TicketController {
       next(error);
     }
   };
+
+  public getTicketById = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const ticket = await this.ticket.getTicketById(ticketId);
+      res.status(201).json({ data: ticket, message: 'Ticket Retrieval successfull' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

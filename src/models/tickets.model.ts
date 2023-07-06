@@ -24,6 +24,16 @@ const TicketSchema: Schema = new Schema(
       ref: 'User',
       required: true,
     },
+
+    comments: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'Comment',
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );

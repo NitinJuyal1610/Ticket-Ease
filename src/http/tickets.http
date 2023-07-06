@@ -5,9 +5,10 @@
 # Find All tickets
 GET {{ baseURL }}/tickets
 
+
 ###
-# # Find Ticket By Id
-# GET {{ baseURL }}/users/1
+# Find Ticket By Id
+GET {{ baseURL }}/tickets/64a6668e46b332c85fd99394
 
 ###
 # Create Ticket
