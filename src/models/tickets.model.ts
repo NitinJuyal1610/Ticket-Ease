@@ -24,7 +24,10 @@ const TicketSchema: Schema = new Schema(
       ref: 'User',
       required: true,
     },
-
+    category: {
+      type: String,
+      required: true,
+    },
     comments: {
       type: [
         {

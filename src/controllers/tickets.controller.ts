@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { Container } from 'typedi';
-import { Ticket } from '@/interfaces/tickets.interface';
+import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { TicketsService } from '@/services/tickets.service';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 
@@ -32,6 +32,24 @@ export class TicketController {
       const ticketId = req.params.id;
       const ticket = await this.ticket.getTicketById(ticketId);
       res.status(201).json({ data: ticket, message: 'Ticket Retrieval successfull' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const updateData: UpdateTicket = {
+        title: req.body.title,
+        description: req.body.description,
+        status: req.body.status,
+        priority: req.body.priority,
+        category: req.body.category,
+      };
+
+      const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData);
+      res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
     } catch (error) {
       next(error);
     }

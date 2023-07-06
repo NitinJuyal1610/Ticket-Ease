@@ -18,18 +18,18 @@ Content-Type: application/json
 {
     "title": "Screen Freeze ",
     "description": "Very bad application , no able to do payment ",
-    "priority":"medium"
+    "priority":"medium",
+    "category":"General Inquiry"
 }
 
-# ###
-# # Modify User By Id
-# PUT {{ baseURL }}/users/1
-# Content-Type: application/json
+###
+# Modify Ticket By Id
+PUT {{ baseURL }}/tickets/64a68efb42abf96b7ca39986
+Content-Type: application/json
 
-# {
-#     "email": "example@email.com",
-#     "password": "password"
-# }
+{
+  "category":"Performance Problem"
+}
 
 # ###
 # # Delete User By Id
