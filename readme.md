@@ -14,6 +14,8 @@ The Ticketing System is a web application that allows users to create, manage, a
 
 - Knowledge Base Integration: The ticketing system integrates a knowledge base or FAQ section to provide self-help resources for users. Users can search and access relevant articles to find solutions to common issues before creating tickets.
 
+- Implemented Considering MVCS (Model Views Controller Services) Architecture  & Typescript Classes 
+
 ## Tools Used
 
 The Ticketing System is built using the following tools and technologies:
