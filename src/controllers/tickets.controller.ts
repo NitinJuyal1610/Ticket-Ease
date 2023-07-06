@@ -2,15 +2,15 @@ import { NextFunction, Response } from 'express';
 import { Container } from 'typedi';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { TicketsService } from '@/services/tickets.service';
-import { RequestWithUser } from '@/interfaces/auth.interface';
+import { RequestWithUser, RequestQuery } from '@/interfaces/auth.interface';
 
 export class TicketController {
   public ticket = Container.get(TicketsService);
   public getTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      console.log(req.user);
-      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user);
-
+      const { status, priority, category } = req.query as RequestQuery;
+      console.log(status, priority, category);
+      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category);
       res.status(201).json({ data: ticketsData, message: 'tickets' });
     } catch (error) {
       next(error);
