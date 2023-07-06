@@ -6,9 +6,11 @@ import { User } from '@/interfaces/users.interface';
 
 @Service()
 export class TicketsService {
-  public async findAllTickets(): Promise<Ticket[]> {
+  public async findAllTickets(user: User): Promise<Ticket[]> {
     try {
-      const tickets: Ticket[] = await TicketModel.find();
+      let tickets = [];
+      if (user.role === 'user') tickets = await TicketModel.find({ createdBy: user._id });
+      else tickets = await TicketModel.find();
       console.log('Retrieved tickets:', tickets);
       return tickets;
     } catch (error) {

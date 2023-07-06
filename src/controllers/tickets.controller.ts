@@ -8,7 +8,8 @@ export class TicketController {
   public ticket = Container.get(TicketsService);
   public getTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      const ticketsData: Ticket[] = await this.ticket.findAllTickets();
+      console.log(req.user);
+      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user);
 
       res.status(201).json({ data: ticketsData, message: 'tickets' });
     } catch (error) {
