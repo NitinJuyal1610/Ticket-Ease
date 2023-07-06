@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { HttpException } from '@exceptions/httpException';
 import { TicketModel } from '@models/tickets.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
+import { User } from '@/interfaces/users.interface';
 
 @Service()
 export class TicketsService {
@@ -24,25 +25,34 @@ export class TicketsService {
     }
   }
 
-  public async getTicketById(ticketId: string): Promise<Ticket> {
+  public async getTicketById(ticketId: string, user: User): Promise<Ticket> {
     try {
       const ticket = await TicketModel.findById(ticketId);
       if (!ticket) {
         throw new HttpException(404, 'Ticket not found');
       }
+
+      if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
+        throw new HttpException(403, 'Unauthorized Access');
+      }
+
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to retrieve ticket with ID ${ticketId}: ${error.message}`);
     }
   }
 
-  public async updateTicketById(ticketId: string, updateData: UpdateTicket): Promise<Ticket> {
+  public async updateTicketById(ticketId: string, updateData: UpdateTicket, user: User): Promise<Ticket> {
     try {
       const ticket = await TicketModel.findById(ticketId);
       if (ticket) {
+        if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
+          throw new HttpException(403, 'Unauthorized Access');
+        }
         const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, updateData, { new: true });
         return updatedTicket;
       }
+
       throw new HttpException(404, 'Ticket not found');
     } catch (error) {
       throw new HttpException(500, `Failed to update ticket with ID ${ticketId}: ${error.message}`);

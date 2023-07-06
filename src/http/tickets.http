@@ -8,7 +8,7 @@ GET {{ baseURL }}/tickets
 
 ###
 # Find Ticket By Id
-GET {{ baseURL }}/tickets/64a6668e46b332c85fd99394
+GET {{ baseURL }}/tickets/64a68efb42abf96b7ca39986
 
 ###
 # Create Ticket
@@ -28,7 +28,7 @@ PUT {{ baseURL }}/tickets/64a68efb42abf96b7ca39986
 Content-Type: application/json
 
 {
-  "category":"Performance Problem"
+  "status":"closed"
 }
 
 # ###

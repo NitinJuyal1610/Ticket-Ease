@@ -30,7 +30,7 @@ export class TicketController {
   public getTicketById = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const ticketId = req.params.id;
-      const ticket = await this.ticket.getTicketById(ticketId);
+      const ticket = await this.ticket.getTicketById(ticketId, req.user);
       res.status(201).json({ data: ticket, message: 'Ticket Retrieval successfull' });
     } catch (error) {
       next(error);
@@ -39,6 +39,7 @@ export class TicketController {
 
   public updateTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
+      console.log(req.user);
       const ticketId = req.params.id;
       const updateData: UpdateTicket = {
         title: req.body.title,
@@ -48,7 +49,7 @@ export class TicketController {
         category: req.body.category,
       };
 
-      const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData);
+      const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData, req.user);
       res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
     } catch (error) {
       next(error);
