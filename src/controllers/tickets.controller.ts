@@ -9,7 +9,6 @@ export class TicketController {
   public getTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const { status, priority, category, sortBy, sortOrder } = req.query as RequestQuery;
-      console.log(status, priority, category);
       const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category, sortBy, sortOrder);
       res.status(201).json({ data: ticketsData, message: 'tickets' });
     } catch (error) {
@@ -40,7 +39,6 @@ export class TicketController {
 
   public updateTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      console.log(req.user);
       const ticketId = req.params.id;
       const updateData: UpdateTicket = {
         title: req.body.title,
@@ -49,9 +47,20 @@ export class TicketController {
         priority: req.body.priority,
         category: req.body.category,
       };
-
       const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData, req.user);
       res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public claimTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const ticket = await this.ticket.assignTicket(ticketId, req.user);
+
+      if (ticket) res.status(201).json({ data: ticket, message: 'Ticket claim successfull' });
+      else res.status(409).json({ data: ticket, message: 'Ticket already claimed' });
     } catch (error) {
       next(error);
     }

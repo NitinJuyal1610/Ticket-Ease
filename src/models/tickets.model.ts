@@ -28,6 +28,11 @@ const TicketSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    assignedAgent: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
     comments: {
       type: [
         {

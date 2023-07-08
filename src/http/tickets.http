@@ -8,7 +8,7 @@ GET {{ baseURL }}/tickets?sortBy=createdAt
 
 ###
 # Find Ticket By Id
-GET {{ baseURL }}/tickets/64a68efb42abf96b7ca39986
+GET {{ baseURL }}/tickets/64a91eddee4c35298bbb9c34
 
 ###
 # Create Ticket
@@ -16,21 +16,25 @@ POST {{ baseURL }}/tickets
 Content-Type: application/json
 
 {
-    "title": "Screen Freeze ",
-    "description": "Very bad application , no able to do payment ",
-    "priority":"medium",
-    "category":"General Inquiry"
+    "title": "Buggy application ",
+    "description": "Lot of Lag while rendering",
+    "priority":"high",
+    "category":"Performance Problem"
 }
 
 ###
 # Modify Ticket By Id
-PUT {{ baseURL }}/tickets/64a6b75e757cdc08e425c391
+PUT {{ baseURL }}/tickets/64a91eddee4c35298bbb9c34
 Content-Type: application/json
 
 {
-  "priority":"high"
+  "priority":"low"
 }
 
-# ###
-# # Delete User By Id
-# DELETE {{ baseURL }}/users/1
+###
+#Claim a Ticket by Id
+PUT {{baseURL}}/tickets/claim/64a91eddee4c35298bbb9c34
+Content-Type: application/json
+
+
+

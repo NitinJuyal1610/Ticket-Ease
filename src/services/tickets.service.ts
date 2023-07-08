@@ -11,26 +11,17 @@ export class TicketsService {
       const filter = {};
       const sorter = {};
       let tickets = [];
-      if (user.role === 'user') {
-        filter['createdBy'] = user._id;
-      }
+      if (user.role === 'user') filter['createdBy'] = user._id;
 
-      if (status) {
-        filter['status'] = status;
-      }
+      if (status) filter['status'] = status;
 
-      if (priority) {
-        filter['priority'] = priority;
-      }
+      if (priority) filter['priority'] = priority;
 
-      if (category) {
-        filter['category'] = category;
-      }
-      if (sortBy) {
-        sorter[sortBy] = sortOrder;
-      }
+      if (category) filter['category'] = category;
+
+      if (sortBy) sorter[sortBy] = sortOrder;
+
       tickets = await TicketModel.find(filter).sort(sorter);
-      console.log('Retrieved tickets:', tickets);
       return tickets;
     } catch (error) {
       throw new HttpException(500, `Failed to retrieve tickets: ${error.message}`);
@@ -70,13 +61,27 @@ export class TicketsService {
         if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
           throw new HttpException(403, 'Unauthorized Access');
         }
-        const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, updateData, { new: true });
+        const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, { $set: updateData }, { new: true });
         return updatedTicket;
       }
 
       throw new HttpException(404, 'Ticket not found');
     } catch (error) {
       throw new HttpException(500, `Failed to update ticket with ID ${ticketId}: ${error.message}`);
+    }
+  }
+
+  public async assignTicket(ticketId: string, user: User): Promise<Ticket> {
+    try {
+      const ticket = await TicketModel.findOneAndUpdate(
+        { _id: ticketId, assignedAgent: null },
+        { $set: { assignedAgent: user._id, status: 'inProgress' } },
+        { new: true },
+      );
+      console.log('ticket update status -o- ', ticket);
+      return ticket;
+    } catch (error) {
+      throw new HttpException(500, `Failed to assign ticket with ID ${ticketId}: ${error.message}`);
     }
   }
 }

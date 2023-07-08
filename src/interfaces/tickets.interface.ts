@@ -8,6 +8,7 @@ export interface Ticket {
   priority: string;
   createdBy: string;
   category: string;
+  assignedAgent: string;
   comments: Comment[];
   createdAt: Date;
   updatedAt: Date;
