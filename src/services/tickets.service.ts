@@ -108,4 +108,17 @@ export class TicketsService {
       throw new HttpException(500, `Failed to retrieve tickets: ${error.message}`);
     }
   }
+
+  public async changeAgent(ticketId: string, userId: string): Promise<Ticket> {
+    try {
+      console.log(ticketId, userId);
+      const ticket = await TicketModel.findByIdAndUpdate(ticketId, { $set: { assignedAgent: userId } });
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+      return ticket;
+    } catch (error) {
+      throw new HttpException(500, `Failed to reassign ticket with ID ${ticketId}: ${error.message}`);
+    }
+  }
 }

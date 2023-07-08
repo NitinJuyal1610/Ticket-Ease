@@ -74,4 +74,16 @@ export class TicketController {
       next(error);
     }
   };
+
+  public reassignTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const newAgentId = req.body.agentId;
+
+      const ticket = await this.ticket.changeAgent(ticketId, newAgentId);
+      res.status(201).json({ data: ticket, message: 'Ticket reassign successfull' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
