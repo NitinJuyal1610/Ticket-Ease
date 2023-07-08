@@ -3,8 +3,11 @@
 
 ###
 # Find All tickets
-GET {{ baseURL }}/tickets?sortBy=createdAt
+GET {{ baseURL }}/tickets
 
+### 
+# (support) Get tickets assigned to me
+GET {{baseURL}}/tickets/claimed
 
 ###
 # Find Ticket By Id

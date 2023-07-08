@@ -20,4 +20,5 @@ export interface RequestQuery {
   category?: string;
   sortBy?: string;
   sortOrder?: string;
+  assigned?: string;
 }

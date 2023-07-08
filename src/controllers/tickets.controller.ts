@@ -8,9 +8,9 @@ export class TicketController {
   public ticket = Container.get(TicketsService);
   public getTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      const { status, priority, category, sortBy, sortOrder } = req.query as RequestQuery;
-      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category, sortBy, sortOrder);
-      res.status(201).json({ data: ticketsData, message: 'tickets' });
+      const { status, priority, category, assigned, sortBy, sortOrder } = req.query as RequestQuery;
+      const ticketsData: Ticket[] = await this.ticket.findAllTickets(req.user, status, priority, category, assigned, sortBy, sortOrder);
+      res.status(200).json({ data: ticketsData, message: 'tickets' });
     } catch (error) {
       next(error);
     }
@@ -31,7 +31,7 @@ export class TicketController {
     try {
       const ticketId = req.params.id;
       const ticket = await this.ticket.getTicketById(ticketId, req.user);
-      res.status(201).json({ data: ticket, message: 'Ticket Retrieval successfull' });
+      res.status(200).json({ data: ticket, message: 'Ticket Retrieval successfull' });
     } catch (error) {
       next(error);
     }
@@ -61,6 +61,15 @@ export class TicketController {
 
       if (ticket) res.status(201).json({ data: ticket, message: 'Ticket claim successfull' });
       else res.status(409).json({ data: ticket, message: 'Ticket already claimed' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getClaimedTickets = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketsData: Ticket[] = await this.ticket.findTickets(req.user);
+      res.status(200).json({ data: ticketsData, message: 'Claimed tickets' });
     } catch (error) {
       next(error);
     }

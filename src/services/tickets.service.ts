@@ -6,7 +6,15 @@ import { User } from '@/interfaces/users.interface';
 
 @Service()
 export class TicketsService {
-  public async findAllTickets(user: User, status: string, priority: string, category: string, sortBy: string, sortOrder: string): Promise<Ticket[]> {
+  public async findAllTickets(
+    user: User,
+    status: string,
+    priority: string,
+    category: string,
+    assigned: string,
+    sortBy: string,
+    sortOrder: string,
+  ): Promise<Ticket[]> {
     try {
       const filter = {};
       const sorter = {};
@@ -17,10 +25,16 @@ export class TicketsService {
 
       if (priority) filter['priority'] = priority;
 
+      if (assigned) {
+        if (assigned === 'true') filter['assignedAgent'] = { $not: { $eq: null } };
+        else if (assigned === 'false') filter['assignedAgent'] = null;
+      }
+
       if (category) filter['category'] = category;
 
       if (sortBy) sorter[sortBy] = sortOrder;
 
+      console.log(filter);
       tickets = await TicketModel.find(filter).sort(sorter);
       return tickets;
     } catch (error) {
@@ -82,6 +96,15 @@ export class TicketsService {
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to assign ticket with ID ${ticketId}: ${error.message}`);
+    }
+  }
+
+  public async findTickets(user: User): Promise<Ticket[]> {
+    try {
+      const tickets = await TicketModel.find({ assignedAgent: user._id });
+      return tickets;
+    } catch (error) {
+      throw new HttpException(500, `Failed to retrieve tickets: ${error.message}`);
     }
   }
 }
