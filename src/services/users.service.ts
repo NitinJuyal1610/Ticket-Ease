@@ -7,12 +7,12 @@ import { UserModel } from '@models/users.model';
 @Service()
 export class UserService {
   public async findAllUser(): Promise<User[]> {
-    const users: User[] = await UserModel.find();
+    const users: User[] = await UserModel.find({ role: 'user' }, { id: 1, email: 1 });
     return users;
   }
 
   public async findUserById(userId: string): Promise<User> {
-    const findUser: User = await UserModel.findOne({ _id: userId });
+    const findUser: User = await UserModel.findOne({ _id: userId }, { id: 1, email: 1 });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
 
     return findUser;
@@ -50,5 +50,14 @@ export class UserService {
     if (!deleteUserById) throw new HttpException(409, "User doesn't exist");
 
     return deleteUserById;
+  }
+
+  public async findAgents(): Promise<User[]> {
+    try {
+      const agents: User[] = await UserModel.find({ role: 'support' }, { id: 1, email: 1 });
+      return agents;
+    } catch (error) {
+      throw new HttpException(500, `Failed to retrieve agents: ${error.message}`);
+    }
   }
 }

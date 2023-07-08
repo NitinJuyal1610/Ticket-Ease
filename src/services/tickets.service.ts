@@ -3,6 +3,7 @@ import { HttpException } from '@exceptions/httpException';
 import { TicketModel } from '@models/tickets.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { User } from '@/interfaces/users.interface';
+import { UserModel } from '@/models/users.model';
 
 @Service()
 export class TicketsService {

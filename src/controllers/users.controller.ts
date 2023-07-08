@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Container } from 'typedi';
 import { User } from '@interfaces/users.interface';
 import { UserService } from '@services/users.service';
+import { RequestWithUser } from '@/interfaces/auth.interface';
 
 export class UserController {
   public user = Container.get(UserService);
@@ -56,6 +57,15 @@ export class UserController {
       const deleteUserData: User = await this.user.deleteUser(userId);
 
       res.status(200).json({ data: deleteUserData, message: 'deleted' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAgents = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const agents: User[] = await this.user.findAgents();
+      res.status(200).json({ data: agents, message: 'Agents Fetched' });
     } catch (error) {
       next(error);
     }

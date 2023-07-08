@@ -5,6 +5,11 @@
 # Find All Users
 GET {{ baseURL }}/users
 
+
+###
+# Find All Support Agents
+GET {{ baseURL }}/users/agents
+
 ###
 # Find User By Id
 GET {{ baseURL }}/users/1
