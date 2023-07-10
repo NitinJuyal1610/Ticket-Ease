@@ -3,7 +3,6 @@ import { HttpException } from '@exceptions/httpException';
 import { TicketModel } from '@models/tickets.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { User } from '@/interfaces/users.interface';
-import { UserModel } from '@/models/users.model';
 
 @Service()
 export class TicketsService {
@@ -89,7 +88,7 @@ export class TicketsService {
   public async assignTicket(ticketId: string, user: User): Promise<Ticket> {
     try {
       const ticket = await TicketModel.findOneAndUpdate(
-        { _id: ticketId, assignedAgent: null },
+        { _id: ticketId, assignedAgent: null, status: 'open' },
         { $set: { assignedAgent: user._id, status: 'inProgress' } },
         { new: true },
       );
@@ -109,16 +108,34 @@ export class TicketsService {
     }
   }
 
-  public async changeAgent(ticketId: string, userId: string): Promise<Ticket> {
+  public async changeAgent(ticketId: string, newAgentId: string, agentId: string): Promise<Ticket> {
     try {
-      console.log(ticketId, userId);
-      const ticket = await TicketModel.findByIdAndUpdate(ticketId, { $set: { assignedAgent: userId } });
+      const ticket = await TicketModel.findOneAndUpdate({ _id: ticketId, assignedAgent: agentId }, { $set: { assignedAgent: newAgentId } });
       if (!ticket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
       }
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to reassign ticket with ID ${ticketId}: ${error.message}`);
+    }
+  }
+
+  public async closeTicket(ticketId: string, agentId: string): Promise<Ticket> {
+    try {
+      const ticket = await TicketModel.findById(ticketId);
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (ticket.assignedAgent != agentId.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      ticket.status = 'closed';
+      ticket.assignedAgent = null;
+      return await ticket.save();
+    } catch (error) {
+      throw new HttpException(500, `Failed to close ticket with ID ${ticketId}`);
     }
   }
 }

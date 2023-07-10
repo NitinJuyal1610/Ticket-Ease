@@ -3,6 +3,7 @@ import { Container } from 'typedi';
 import { RequestWithUser } from '@interfaces/auth.interface';
 import { User } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
+import { transporter } from '@/utils/Trasporter';
 
 export class AuthController {
   public auth = Container.get(AuthService);
@@ -11,7 +12,14 @@ export class AuthController {
     try {
       const userData: User = req.body;
       const signUpUserData: User = await this.auth.signup(userData);
+      const info = await transporter.sendMail({
+        to: userData.email,
+        from: process.env.EMAIL_FROM,
+        subject: 'Welcome to Ticketing Application',
+        html: `<h1> You successfully signed up! </h1>`,
+      });
 
+      console.log('Email sent:', info.message);
       res.status(201).json({ data: signUpUserData, message: 'signup' });
     } catch (error) {
       next(error);

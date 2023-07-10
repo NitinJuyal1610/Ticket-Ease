@@ -79,11 +79,24 @@ export class TicketController {
     try {
       const ticketId = req.params.id;
       const newAgentId = req.body.agentId;
+      const agentId = req.user._id;
 
-      const ticket = await this.ticket.changeAgent(ticketId, newAgentId);
+      const ticket = await this.ticket.changeAgent(ticketId, newAgentId, agentId);
       res.status(201).json({ data: ticket, message: 'Ticket reassign successfull' });
     } catch (error) {
       next(error);
+    }
+  };
+
+  public resolveTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const agentId = req.user._id;
+      const ticket: Ticket = await this.ticket.closeTicket(ticketId, agentId);
+
+      res.status(201).json({ message: 'Ticket resolved', data: ticket });
+    } catch (err) {
+      next(err);
     }
   };
 }
