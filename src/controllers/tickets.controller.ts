@@ -3,6 +3,8 @@ import { Container } from 'typedi';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { TicketsService } from '@/services/tickets.service';
 import { RequestWithUser, RequestQuery } from '@/interfaces/auth.interface';
+import { transporter } from '@/utils/transporter';
+import { User } from '@/interfaces/users.interface';
 
 export class TicketController {
   public ticket = Container.get(TicketsService);
@@ -21,6 +23,13 @@ export class TicketController {
       const ticketData = req.body;
       ticketData.createdBy = req.user._id;
       const ticket = await this.ticket.newTicket(ticketData);
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: req.user.email,
+        subject: 'Ticket Creation',
+        html: `<h2>New Ticket Created!><h2>`,
+      });
+
       res.status(201).json({ data: ticket, message: 'Ticket creation successfull' });
     } catch (error) {
       next(error);
@@ -47,7 +56,15 @@ export class TicketController {
         priority: req.body.priority,
         category: req.body.category,
       };
+
       const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData, req.user);
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: req.user.email,
+        subject: 'Ticket Updation',
+        html: `<h2>Ticket Updated Successfully!<h2>`,
+      });
+
       res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
     } catch (error) {
       next(error);
@@ -58,6 +75,23 @@ export class TicketController {
     try {
       const ticketId = req.params.id;
       const ticket = await this.ticket.assignTicket(ticketId, req.user);
+
+      //email for support agent
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: req.user.email,
+        subject: 'Ticket Claimed',
+        html: `<h2>Successfully Claimed Ticket with Id: ${ticket._id} !<h2>`,
+      });
+
+      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: ticket.createdBy.email,
+          subject: 'Ticket Assigned',
+          html: `<h5>Ticket with, Id: <p> ${ticket._id}</p> assigned to Agent with email ${req.user.email}<h5>`,
+        });
+      }
 
       if (ticket) res.status(201).json({ data: ticket, message: 'Ticket claim successfull' });
       else res.status(409).json({ data: ticket, message: 'Ticket already claimed' });

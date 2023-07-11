@@ -1,6 +1,9 @@
+import { Types } from 'mongoose';
+import { User } from './users.interface';
+
 export interface Comment {
-  id?: string;
+  id?: Types.ObjectId;
   comment: string;
-  author: string;
+  author: Types.ObjectId | User;
   createdAt: Date;
 }

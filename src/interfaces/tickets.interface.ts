@@ -1,14 +1,16 @@
 import { Comment } from './comments.interface';
+import { Types } from 'mongoose';
+import { User } from './users.interface';
 
 export interface Ticket {
-  _id?: string;
+  _id?: Types.ObjectId;
   title: string;
   description: string;
   status?: string;
   priority: string;
-  createdBy: string;
+  createdBy: Types.ObjectId | User;
   category: string;
-  assignedAgent: string;
+  assignedAgent: Types.ObjectId | User;
   comments: Comment[];
   createdAt: Date;
   updatedAt: Date;

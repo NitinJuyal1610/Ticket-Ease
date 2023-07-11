@@ -7,9 +7,9 @@ POST {{ baseURL }}/signup
 Content-Type: application/json
 
 {
-    "email": "wifet74017@kameili.com",
+    "email": "nodawi6590@iturchia.com",
     "password": "password1212",
-    "role":"support"
+    "role":"user"
 }
 
 ###

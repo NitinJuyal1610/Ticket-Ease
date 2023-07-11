@@ -36,7 +36,7 @@ Content-Type: application/json
 
 ###
 #Claim a Ticket by Id
-PUT {{baseURL}}/tickets/claim/64a91eddee4c35298bbb9c34
+PUT {{baseURL}}/tickets/claim/64accf1b8a377592877d764b
 Content-Type: application/json
 
 

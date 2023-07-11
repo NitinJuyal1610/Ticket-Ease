@@ -92,6 +92,8 @@ export class TicketsService {
         { $set: { assignedAgent: user._id, status: 'inProgress' } },
         { new: true },
       );
+
+      await ticket.populate('createdBy');
       console.log('ticket update status -o- ', ticket);
       return ticket;
     } catch (error) {
@@ -127,7 +129,7 @@ export class TicketsService {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
       }
 
-      if (ticket.assignedAgent != agentId.toString()) {
+      if (ticket.assignedAgent.toString() != agentId.toString()) {
         throw new HttpException(403, 'Unauthorized Operation');
       }
 
