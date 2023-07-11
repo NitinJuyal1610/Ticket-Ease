@@ -112,10 +112,17 @@ export class TicketsService {
 
   public async changeAgent(ticketId: string, newAgentId: string, agentId: string): Promise<Ticket> {
     try {
-      const ticket = await TicketModel.findOneAndUpdate({ _id: ticketId, assignedAgent: agentId }, { $set: { assignedAgent: newAgentId } });
+      const ticket = await TicketModel.findOneAndUpdate(
+        { _id: ticketId, assignedAgent: agentId },
+        { $set: { assignedAgent: newAgentId } },
+        { new: true },
+      );
       if (!ticket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
       }
+      console.log('new ticket ', ticket);
+      await ticket.populate('createdBy');
+      await ticket.populate('assignedAgent');
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to reassign ticket with ID ${ticketId}: ${error.message}`);
@@ -135,7 +142,9 @@ export class TicketsService {
 
       ticket.status = 'closed';
       ticket.assignedAgent = null;
-      return await ticket.save();
+      const closedTicket = await ticket.save();
+      await closedTicket.populate('createdBy');
+      return closedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to close ticket with ID ${ticketId}`);
     }

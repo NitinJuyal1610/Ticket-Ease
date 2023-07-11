@@ -40,12 +40,17 @@ PUT {{baseURL}}/tickets/claim/64accf1b8a377592877d764b
 Content-Type: application/json
 
 
-
 ###
 #Reassign a Ticket
-PUT {{baseURL}}/tickets/64a91eddee4c35298bbb9c34/reassign
+PUT {{baseURL}}/tickets/64accf1b8a377592877d764b/reassign
 Content-Type: application/json
 
 {
-  "agentId":"64a994d3261c495678c04cd7"
+  "agentId":"64acd8509c1e47d14f4bd3bb"
 }
+
+
+###
+#Close a ticket
+PUT {{baseURL}}/tickets/64accd54849dca2daea02246/resolve
+Content-Type: application/json

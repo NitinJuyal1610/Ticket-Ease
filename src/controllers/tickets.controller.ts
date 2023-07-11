@@ -4,7 +4,6 @@ import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { TicketsService } from '@/services/tickets.service';
 import { RequestWithUser, RequestQuery } from '@/interfaces/auth.interface';
 import { transporter } from '@/utils/transporter';
-import { User } from '@/interfaces/users.interface';
 
 export class TicketController {
   public ticket = Container.get(TicketsService);
@@ -27,7 +26,7 @@ export class TicketController {
         from: process.env.EMAIL_FROM,
         to: req.user.email,
         subject: 'Ticket Creation',
-        html: `<h2>New Ticket Created!><h2>`,
+        html: `<h4>New Ticket Created!><h4>`,
       });
 
       res.status(201).json({ data: ticket, message: 'Ticket creation successfull' });
@@ -62,7 +61,7 @@ export class TicketController {
         from: process.env.EMAIL_FROM,
         to: req.user.email,
         subject: 'Ticket Updation',
-        html: `<h2>Ticket Updated Successfully!<h2>`,
+        html: `<h4>Ticket Updated Successfully!<h4>`,
       });
 
       res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
@@ -81,7 +80,7 @@ export class TicketController {
         from: process.env.EMAIL_FROM,
         to: req.user.email,
         subject: 'Ticket Claimed',
-        html: `<h2>Successfully Claimed Ticket with Id: ${ticket._id} !<h2>`,
+        html: `<h5>Successfully Claimed Ticket with Id: <p>${ticket._id}</p> !<h5>`,
       });
 
       if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
@@ -114,8 +113,36 @@ export class TicketController {
       const ticketId = req.params.id;
       const newAgentId = req.body.agentId;
       const agentId = req.user._id;
-
       const ticket = await this.ticket.changeAgent(ticketId, newAgentId, agentId);
+
+      //email for prev agent
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: req.user.email,
+        subject: 'Ticket Reassigned Successfully',
+        html: `<h5>Successfully Reassigned Ticket with Id: <p>${ticket._id}</p> !<h5>`,
+      });
+
+      //email for new agent
+      if (typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: ticket.assignedAgent.email,
+          subject: 'Ticket Assigned',
+          html: `<h5>Ticket with, Id: <p> ${ticket._id}</p> Assigned to you by the Agent with email ${req.user.email}<h5>`,
+        });
+      }
+
+      //email for user
+      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: ticket.createdBy.email,
+          subject: 'New Agent Assigned',
+          html: `<h5>Ticket Assigned to a new Agent<h5>`,
+        });
+      }
+
       res.status(201).json({ data: ticket, message: 'Ticket reassign successfull' });
     } catch (error) {
       next(error);
@@ -127,7 +154,22 @@ export class TicketController {
       const ticketId = req.params.id;
       const agentId = req.user._id;
       const ticket: Ticket = await this.ticket.closeTicket(ticketId, agentId);
+      //email for support agent
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: req.user.email,
+        subject: 'Ticket Closed',
+        html: `<h5>Successfully Closed Ticket with Id: <p>${ticket._id}</p> !<h5>`,
+      });
 
+      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_FROM,
+          to: ticket.createdBy.email,
+          subject: 'Ticket Closed',
+          html: `<h5>Ticket with, Id: <p> ${ticket._id}</p> Closed by the Agent with email ${req.user.email}<h5>`,
+        });
+      }
       res.status(201).json({ message: 'Ticket resolved', data: ticket });
     } catch (err) {
       next(err);
