@@ -13,7 +13,7 @@ export class AuthController {
       const userData: User = req.body;
       const signUpUserData: User = await this.auth.signup(userData);
 
-      await sendMail(userData.email, 'Welcome to Ticketing Application', `<h2>Welcome to Ticketing Application!<h2>`);
+      await sendMail(userData.email, 'Welcome to Ticketing Application', `<h3>Welcome to Ticketing Application!<h3>`);
 
       res.status(201).json({ data: signUpUserData, message: 'signup' });
     } catch (error) {

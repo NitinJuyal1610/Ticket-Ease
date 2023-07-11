@@ -22,7 +22,7 @@ export class TicketController {
       const ticketData = req.body;
       ticketData.createdBy = req.user._id;
       const ticket = await this.ticket.newTicket(ticketData);
-      await sendMail(req.user.email, 'Ticket Creation', `<h4>New Ticket Created!><h4>`);
+      await sendMail(req.user.email, 'Ticket Creation', `<h3>New Ticket Created!<h3>`);
 
       res.status(201).json({ data: ticket, message: 'Ticket creation successfull' });
     } catch (error) {
@@ -52,7 +52,7 @@ export class TicketController {
       };
 
       const updatedTicket = await this.ticket.updateTicketById(ticketId, updateData, req.user);
-      await sendMail(req.user.email, 'Ticket Updation', `<h4>Ticket Updated Successfully!<h4>`);
+      await sendMail(req.user.email, 'Ticket Updation', `<h3>Ticket Updated Successfully!<h3>`);
 
       res.status(201).json({ data: updatedTicket, message: 'Ticket update successfull' });
     } catch (error) {
@@ -66,7 +66,7 @@ export class TicketController {
       const ticket = await this.ticket.assignTicket(ticketId, req.user);
 
       //email for support agent
-      await sendMail(req.user.email, 'Ticket Claimed', `<h5>Successfully Claimed Ticket with Id: <p>${ticket._id}</p> !<h5>`);
+      await sendMail(req.user.email, 'Ticket Claimed', `<h5>Successfully Claimed Ticket with Id: <p>${ticket._id}</p>!<h5>`);
 
       if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(
@@ -100,14 +100,14 @@ export class TicketController {
       const ticket = await this.ticket.changeAgent(ticketId, newAgentId, agentId);
 
       //email for prev agent
-      await sendMail(req.user.email, 'Ticket Reassigned Successfully', `<h5>Successfully Reassigned Ticket with Id: <p>${ticket._id}</p> !<h5>`);
+      await sendMail(req.user.email, 'Ticket Reassigned Successfully', `<h5>Successfully Reassigned Ticket with Id: <p>${ticket._id}</p><h5>`);
 
       //email for new agent
       if (typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
         await sendMail(
           ticket.assignedAgent.email,
           'Ticket Assigned',
-          `<h5>Ticket with, Id: <p> ${ticket._id}</p> Assigned to you by the Agent with email ${req.user.email}<h5>`,
+          `<h5>Ticket with, Id: <p> ${ticket._id}</p>Assigned to you by the Agent with email ${req.user.email}<h5>`,
         );
       }
 
@@ -128,7 +128,7 @@ export class TicketController {
       const agentId = req.user._id;
       const ticket: Ticket = await this.ticket.closeTicket(ticketId, agentId);
       //email for support agent
-      await sendMail(req.user.email, 'Ticket Closed', `<h5>Successfully Closed Ticket with Id: <p>${ticket._id}</p> !<h5>`);
+      await sendMail(req.user.email, 'Ticket Closed', `<h5>Successfully Closed Ticket with Id: <p>${ticket._id}</p>!<h5>`);
 
       if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(
