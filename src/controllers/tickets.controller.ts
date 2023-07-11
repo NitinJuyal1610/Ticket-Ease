@@ -142,4 +142,15 @@ export class TicketController {
       next(err);
     }
   };
+
+  public addComment = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const comment = req.body.text;
+      const ticket = await this.ticket.createComment(ticketId, comment, req.user);
+      res.status(201).json({ data: ticket, message: 'Ticket comment added' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

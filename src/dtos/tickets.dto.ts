@@ -13,6 +13,7 @@ const categories = [
   'General Inquiry',
 ];
 
+// Data transfer object for creating ticket
 export class CreateTicketDto {
   @IsNotEmpty()
   @IsString()
@@ -37,6 +38,7 @@ export class CreateTicketDto {
   public category: string;
 }
 
+// DTO For updating Ticket
 export class UpdateTicketDto {
   @IsString()
   @MinLength(2)
@@ -63,4 +65,13 @@ export class UpdateTicketDto {
   @IsString()
   @IsIn(categories)
   public category?: string;
+}
+
+//DTO For adding a comment
+export class CreateCommentDto {
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(2)
+  @MaxLength(64)
+  public text: string;
 }

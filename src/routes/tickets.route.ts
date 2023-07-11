@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { TicketController } from '@controllers/tickets.controller';
-import { CreateTicketDto, UpdateTicketDto } from '@dtos/tickets.dto';
+import { CreateTicketDto, UpdateTicketDto, CreateCommentDto } from '@dtos/tickets.dto';
 import { Routes } from '@interfaces/routes.interface';
 import { ValidationMiddleware } from '@/interfaces/middlewares/validation.middleware';
 import { AuthMiddleware } from '@/interfaces/middlewares/auth.middleware';
@@ -20,8 +20,14 @@ export class TicketRoute implements Routes {
     this.router.get(`${this.path}/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTicketById);
     this.router.put(`${this.path}/:id/reassign`, AuthMiddleware(['admin', 'support']), this.ticket.reassignTicket);
     this.router.put(`${this.path}/:id/resolve`, AuthMiddleware(['admin', 'support']), this.ticket.resolveTicket);
+    this.router.post(
+      `${this.path}/comment/:id`,
+      AuthMiddleware(['admin', 'support', 'user']),
+      ValidationMiddleware(CreateCommentDto, true),
+      this.ticket.addComment,
+    );
     this.router.post(`${this.path}`, AuthMiddleware(['user']), ValidationMiddleware(CreateTicketDto, true), this.ticket.createTicket);
-    this.router.put(`${this.path}/?:id`, AuthMiddleware(['admin', 'user']), ValidationMiddleware(UpdateTicketDto, true), this.ticket.updateTicket);
+    this.router.put(`${this.path}/:id`, AuthMiddleware(['admin', 'user']), ValidationMiddleware(UpdateTicketDto, true), this.ticket.updateTicket);
     this.router.put(`${this.path}/claim/:id`, AuthMiddleware(['admin', 'support']), this.ticket.claimTicket);
   }
 }

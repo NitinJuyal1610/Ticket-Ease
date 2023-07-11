@@ -11,7 +11,7 @@ export interface Ticket {
   createdBy: Types.ObjectId | User;
   category: string;
   assignedAgent: Types.ObjectId | User;
-  comments: Comment[];
+  comments: Comment[] | Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }

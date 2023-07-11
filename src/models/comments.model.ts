@@ -3,7 +3,7 @@ import { Comment } from '@/interfaces/comments.interface';
 
 const CommentSchema: Schema = new Schema(
   {
-    comment: {
+    text: {
       type: String,
       required: true,
     },

@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import { HttpException } from '@exceptions/httpException';
 import { TicketModel } from '@models/tickets.model';
+import { CommentModel } from '@/models/comments.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { User } from '@/interfaces/users.interface';
 
@@ -147,6 +148,32 @@ export class TicketsService {
       return closedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to close ticket with ID ${ticketId}`);
+    }
+  }
+
+  public async createComment(ticketId: string, commentData: string, user: User): Promise<Ticket> {
+    try {
+      const ticket = await TicketModel.findById(ticketId);
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      if (user.role == 'user' && ticket.createdBy.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      const comment = await CommentModel.create({ text: commentData, author: user._id });
+
+      ticket.comments.push(comment._id);
+      await ticket.save();
+      await ticket.populate('comments');
+      return ticket;
+    } catch (error) {
+      throw new HttpException(500, `Failed to create comment: ${error.message}`);
     }
   }
 }

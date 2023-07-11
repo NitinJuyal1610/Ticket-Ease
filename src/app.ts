@@ -26,10 +26,14 @@ export class App {
     this.port = PORT || 3000;
 
     this.connectToDatabase();
+    console.log('Connected to DB');
     this.initializeMiddlewares();
+    console.log('Initialized Middlewares');
     this.initializeRoutes(routes);
+    console.log('Initialized Routes');
     this.initializeSwagger();
     this.initializeErrorHandling();
+    console.log('Initialized Error Handler');
   }
 
   public listen() {
