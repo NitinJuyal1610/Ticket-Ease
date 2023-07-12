@@ -4,17 +4,27 @@ The Ticketing System is a web application that allows users to create, manage, a
 
 ## Features
 
-- User Registration and Authentication: Users can create accounts and log in to the ticketing system. User authentication is implemented to ensure secure access to the application.
+- **System Architecture:** Built with Node.js, Express.js, and MongoDB, the ticketing system integrates with an email service provider for notifications.
 
-- Ticket Management: Users can create new tickets by providing detailed descriptions of the issues they are facing. Support agents can view and manage tickets assigned to them. Ticket status can be tracked (e.g., open, in progress, resolved). Users and support agents can add comments and updates to tickets to track their progress.
+- **Development Environment Setup:** Backend tools, dependencies, database connections, and email service provider are installed and configured.
 
-- Role-based Access Control: The ticketing system implements role-based access control (RBAC) to manage user roles and permissions. Administrators have additional privileges to manage roles, assign permissions, and modify access control rules.
+- **User Registration and Authentication:** Users can create accounts and securely log in using authentication tokens or JWT.
 
-- Notifications: Email notifications are sent to users when their tickets are created, updated, or resolved. Users receive notifications about important updates and comments on their tickets.
+- **Role-based Access Control:** Different roles (e.g., admin, support agent, customer) are defined with access permissions.
 
-- Knowledge Base Integration: The ticketing system integrates a knowledge base or FAQ section to provide self-help resources for users. Users can search and access relevant articles to find solutions to common issues before creating tickets.
+- **Ticket Management:** Users can create detailed tickets, view and manage assigned tickets, and track ticket status and updates.
 
-- Implemented Considering MVCS (Model Views Controller Services) Architecture  & Typescript Classes 
+- **Ticket Assignment:** Support agents can claim and assign tickets, allowing for reassignment if necessary.
+
+- **Ticket Updates and Notifications:** Email notifications are sent to users for ticket creation and updates. API endpoints provide access to ticket history and comments.
+
+- **Error Handling and Security:** Informative error messages, input validation, and secure authentication and authorization practices are implemented.
+
+- **Testing and Documentation:** Unit and integration tests are written, and API endpoints are documented for clarity.
+
+- **Deployment and Performance Optimization:** Backend components are deployed on hosting platforms, with monitoring and logging for performance optimization and issue troubleshooting.
+
+- **Implemented Considering MVCS** (Model Views Controller Services) Architecture  & Typescript Classes 
 
 ## Tools Used
 
