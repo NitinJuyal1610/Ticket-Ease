@@ -6,13 +6,11 @@ The Ticketing System is a web application that allows users to create, manage, a
 
 - **System Architecture:** Built with Node.js, Express.js, and MongoDB, the ticketing system integrates with an email service provider for notifications.
 
-- **Development Environment Setup:** Backend tools, dependencies, database connections, and email service provider are installed and configured.
-
 - **User Registration and Authentication:** Users can create accounts and securely log in using authentication tokens or JWT.
 
-- **Role-based Access Control:** Different roles (e.g., admin, support agent, customer) are defined with access permissions.
+- **Role-based Access Control:** Different roles (e.g., admin, support agent, user) are defined with access permissions.
 
-- **Ticket Management:** Users can create detailed tickets, view and manage assigned tickets, and track ticket status and updates.
+- **Ticket Management:** Users can create detailed tickets, view and manage assigned tickets, and make updates.
 
 - **Ticket Assignment:** Support agents can claim and assign tickets, allowing for reassignment if necessary.
 
@@ -23,8 +21,7 @@ The Ticketing System is a web application that allows users to create, manage, a
 - **Testing and Documentation:** Unit and integration tests are written, and API endpoints are documented for clarity.
 
 - **Deployment and Performance Optimization:** Backend components are deployed on hosting platforms, with monitoring and logging for performance optimization and issue troubleshooting.
-
-- **Implemented Considering MVCS** (Model Views Controller Services) Architecture  & Typescript Classes 
+ 
 
 ## Tools Used
 
