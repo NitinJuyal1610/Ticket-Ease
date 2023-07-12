@@ -64,3 +64,8 @@ Content-Type: application/json
 {
   "text":"Lol! it can be fixed easily."
 }
+
+###
+# get Ticket Comments
+GET {{baseURL}}/tickets/comments/64ad50c973eab63175a7d00c
+Content-Type: application/json

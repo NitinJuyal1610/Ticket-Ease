@@ -4,6 +4,7 @@ import { TicketModel } from '@models/tickets.model';
 import { CommentModel } from '@/models/comments.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { User } from '@/interfaces/users.interface';
+import { Comment } from '@/interfaces/comments.interface';
 
 @Service()
 export class TicketsService {
@@ -36,7 +37,7 @@ export class TicketsService {
       if (sortBy) sorter[sortBy] = sortOrder;
 
       console.log(filter);
-      tickets = await TicketModel.find(filter).sort(sorter);
+      tickets = await TicketModel.find(filter).populate('comments').sort(sorter);
       return tickets;
     } catch (error) {
       throw new HttpException(500, `Failed to retrieve tickets: ${error.message}`);
@@ -54,7 +55,7 @@ export class TicketsService {
 
   public async getTicketById(ticketId: string, user: User): Promise<Ticket> {
     try {
-      const ticket = await TicketModel.findById(ticketId);
+      const ticket = await TicketModel.findById(ticketId).populate('comments');
       if (!ticket) {
         throw new HttpException(404, 'Ticket not found');
       }
@@ -76,7 +77,7 @@ export class TicketsService {
         if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
           throw new HttpException(403, 'Unauthorized Access');
         }
-        const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, { $set: updateData }, { new: true });
+        const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, { $set: updateData }, { new: true }).populate('comments');
         return updatedTicket;
       }
 
@@ -145,6 +146,7 @@ export class TicketsService {
       ticket.assignedAgent = null;
       const closedTicket = await ticket.save();
       await closedTicket.populate('createdBy');
+      await closedTicket.populate('comments');
       return closedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to close ticket with ID ${ticketId}`);
@@ -174,6 +176,28 @@ export class TicketsService {
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to create comment: ${error.message}`);
+    }
+  }
+
+  public async getComments(ticketId: string, user: User): Promise<Comment[]> {
+    try {
+      const ticket = await TicketModel.findById(ticketId).populate('comments');
+
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      if (user.role == 'user' && ticket.createdBy.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      return ticket.comments as Comment[];
+    } catch (error) {
+      throw new HttpException(500, `Failed to retrieve comments: ${error.message}`);
     }
   }
 }

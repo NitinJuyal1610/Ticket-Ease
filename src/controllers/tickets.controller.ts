@@ -153,4 +153,14 @@ export class TicketController {
       next(error);
     }
   };
+
+  public getCommentsById = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const comments = await this.ticket.getComments(ticketId, req.user);
+      res.status(200).json({ data: comments, message: 'Ticket comments' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

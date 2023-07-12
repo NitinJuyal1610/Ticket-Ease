@@ -18,6 +18,7 @@ export class TicketRoute implements Routes {
     this.router.get(`${this.path}`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTickets);
     this.router.get(`${this.path}/claimed`, AuthMiddleware(['admin', 'support']), this.ticket.getClaimedTickets);
     this.router.get(`${this.path}/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTicketById);
+    this.router.get(`${this.path}/comments/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getCommentsById);
     this.router.put(`${this.path}/:id/reassign`, AuthMiddleware(['admin', 'support']), this.ticket.reassignTicket);
     this.router.put(`${this.path}/:id/resolve`, AuthMiddleware(['admin', 'support']), this.ticket.resolveTicket);
     this.router.post(
@@ -26,6 +27,7 @@ export class TicketRoute implements Routes {
       ValidationMiddleware(CreateCommentDto, true),
       this.ticket.addComment,
     );
+
     this.router.post(`${this.path}`, AuthMiddleware(['user']), ValidationMiddleware(CreateTicketDto, true), this.ticket.createTicket);
     this.router.put(`${this.path}/:id`, AuthMiddleware(['admin', 'user']), ValidationMiddleware(UpdateTicketDto, true), this.ticket.updateTicket);
     this.router.put(`${this.path}/claim/:id`, AuthMiddleware(['admin', 'support']), this.ticket.claimTicket);
