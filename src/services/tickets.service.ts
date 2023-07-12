@@ -95,6 +95,10 @@ export class TicketsService {
         { new: true },
       );
 
+      if (!ticket) {
+        throw new HttpException(404, 'Ticket not found');
+      }
+
       await ticket.populate('createdBy');
       console.log('ticket update status -o- ', ticket);
       return ticket;
@@ -143,10 +147,10 @@ export class TicketsService {
       }
 
       ticket.status = 'closed';
-      ticket.assignedAgent = null;
+
       const closedTicket = await ticket.save();
-      await closedTicket.populate('createdBy');
-      await closedTicket.populate('comments');
+      await closedTicket.populate(['createdBy', 'comments']);
+
       return closedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to close ticket with ID ${ticketId}`);
@@ -158,6 +162,10 @@ export class TicketsService {
       const ticket = await TicketModel.findById(ticketId);
       if (!ticket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (!ticket.assignedAgent) {
+        throw new HttpException(404, `Ticket not yet assigned to an agent`);
       }
 
       if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {
@@ -172,7 +180,7 @@ export class TicketsService {
 
       ticket.comments.push(comment._id);
       await ticket.save();
-      await ticket.populate('comments');
+      await ticket.populate(['comments', 'createdBy', 'assignedAgent']);
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to create comment: ${error.message}`);
@@ -198,6 +206,28 @@ export class TicketsService {
       return ticket.comments as Comment[];
     } catch (error) {
       throw new HttpException(500, `Failed to retrieve comments: ${error.message}`);
+    }
+  }
+
+  public async findAndDeleteTicket(ticketId: string, user: User): Promise<Ticket> {
+    try {
+      const ticket = await TicketModel.findById(ticketId);
+
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      await CommentModel.deleteMany({ _id: { $in: ticket.comments } });
+
+      const deletedTicket = await TicketModel.findByIdAndDelete(ticketId).populate('createdBy');
+
+      return deletedTicket;
+    } catch (error) {
+      throw new HttpException(500, `Failed to delete ticket with ID ${ticketId}: ${error.message}`);
     }
   }
 }

@@ -2,19 +2,19 @@
 @baseURL = http://localhost:3000
 
 ###
-# Find All tickets
+# Find All tickets (User & Support)
 GET {{ baseURL }}/tickets
 
 ### 
-# (support) Get tickets assigned to me
+# Get tickets assigned to me (Support)
 GET {{baseURL}}/tickets/claimed
 
 ###
-# Find Ticket By Id
+# Find Ticket By Id (User & Support)
 GET {{ baseURL }}/tickets/64a91eddee4c35298bbb9c34
 
 ###
-# Create Ticket
+# Create Ticket (User)
 POST {{ baseURL }}/tickets
 Content-Type: application/json
 
@@ -26,8 +26,8 @@ Content-Type: application/json
 }
 
 ###
-# Modify Ticket By Id
-PUT {{ baseURL }}/tickets/64a91eddee4c35298bbb9c34
+# Modify Ticket By Id (User)
+PUT {{ baseURL }}/tickets/64ae590e34b8c8f4fce50364
 Content-Type: application/json
 
 {
@@ -35,30 +35,30 @@ Content-Type: application/json
 }
 
 ###
-#Claim a Ticket by Id
-PUT {{baseURL}}/tickets/claim/64ad50c973eab63175a7d00c
+#Claim a Ticket by Id (Support)
+PUT {{baseURL}}/tickets/claim/64ae5f5a9814db50b61d5bf2
 Content-Type: application/json
 
 
 ###
-#Reassign a Ticket
-PUT {{baseURL}}/tickets/64accf1b8a377592877d764b/reassign
+#Reassign a Ticket (Support)
+PUT {{baseURL}}/tickets/64ae590e34b8c8f4fce50364/reassign
 Content-Type: application/json
 
 {
-  "agentId":"64acde931e9ccba763a38efa"
+  "agentId":"64ae5bfea4496e04d93142d6"
 }
 
 
 ###
-#Close a ticket
-PUT {{baseURL}}/tickets/64accd54849dca2daea02246/resolve
+#Close a ticket (Support)
+PUT {{baseURL}}/tickets/64ae5f5a9814db50b61d5bf2/resolve
 Content-Type: application/json
 
 
 ###
-# add Comment
-POST {{baseURL}}/tickets/comment/64ad50c973eab63175a7d00c
+# Add Comment (User & Support)
+POST {{baseURL}}/tickets/comment/64ae5f5a9814db50b61d5bf2
 Content-Type: application/json
 
 {
@@ -66,6 +66,10 @@ Content-Type: application/json
 }
 
 ###
-# get Ticket Comments
-GET {{baseURL}}/tickets/comments/64ad50c973eab63175a7d00c
+# Get Ticket Comments (User & Support)
+GET {{baseURL}}/tickets/comments/64ae5f5a9814db50b61d5bf2
 Content-Type: application/json
+
+###
+# Delete Ticket (Support)
+DELETE {{ baseURL }}/tickets/64ae5f5a9814db50b61d5bf2

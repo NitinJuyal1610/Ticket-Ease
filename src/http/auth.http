@@ -7,7 +7,7 @@ POST {{ baseURL }}/signup
 Content-Type: application/json
 
 {
-    "email": "wifet74017@kameili.com",
+    "email": "njtesting123@gmail.com",
     "password": "password1212",
     "role":"support"
 }
@@ -18,12 +18,14 @@ POST {{ baseURL }}/login
 Content-Type: application/json
 
 {
-    "email": "wifet74017@kameili.com",
+    "email": "njtesting123@gmail.com",
     "password": "password1212",
     "role":"support"
 }
-
 ###
 # User Logout
 POST {{ baseURL }}/logout
 Content-Type: application/json
+
+
+

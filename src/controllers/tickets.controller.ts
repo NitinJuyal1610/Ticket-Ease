@@ -148,6 +148,15 @@ export class TicketController {
       const ticketId = req.params.id;
       const comment = req.body.text;
       const ticket = await this.ticket.createComment(ticketId, comment, req.user);
+
+      //email for user/owner of ticket
+      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+        await sendMail(ticket.createdBy.email, 'New Comment Added', `<h5>New Comment Added on the Ticket with Id: <p>${ticket._id}</p><h5>`);
+      }
+      //email for support agent
+      if (typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
+        await sendMail(ticket.assignedAgent.email, 'New Comment Added', `<h5>New Comment Added on the Ticket with Id: <p>${ticket._id}</p> <h5>`);
+      }
       res.status(201).json({ data: ticket, message: 'Ticket comment added' });
     } catch (error) {
       next(error);
@@ -159,6 +168,30 @@ export class TicketController {
       const ticketId = req.params.id;
       const comments = await this.ticket.getComments(ticketId, req.user);
       res.status(200).json({ data: comments, message: 'Ticket comments' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public deleteTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const ticket = await this.ticket.findAndDeleteTicket(ticketId, req.user);
+
+      //email for user/owner of ticket
+      //agent and admin can delete the ticket
+      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+        await sendMail(
+          ticket.createdBy.email,
+          'Ticket Deleted',
+          `<h5>Ticket with Id: <p>${ticket._id}</p> Deleted admin/agent with email ${req.user.email} <h5>`,
+        );
+      }
+
+      //email for support agent
+      await sendMail(req.user.email, 'Ticket Deleted', `<h5> Ticket with Id: <p>${ticket._id}</p> Deleted <h5>`);
+
+      res.status(200).json({ data: ticket, message: 'Ticket deleted' });
     } catch (error) {
       next(error);
     }
