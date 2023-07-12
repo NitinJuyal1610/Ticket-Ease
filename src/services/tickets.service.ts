@@ -5,6 +5,8 @@ import { CommentModel } from '@/models/comments.model';
 import { Ticket, UpdateTicket } from '@/interfaces/tickets.interface';
 import { User } from '@/interfaces/users.interface';
 import { Comment } from '@/interfaces/comments.interface';
+import { TicketLog } from '@/interfaces/ticketLog.interface';
+import { TicketLogModel } from '@/models/ticketLogs.model';
 
 @Service()
 export class TicketsService {
@@ -46,6 +48,20 @@ export class TicketsService {
 
   public async newTicket(ticketData: Ticket): Promise<Ticket> {
     try {
+      // logging the ticket creation
+      const updateData = {
+        userId: ticketData.createdBy,
+        updateType: 'newTicket',
+        updateFields: ticketData,
+      };
+
+      const logData = await TicketLogModel.create(updateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
+      }
+      ticketData['history'] = [logData._id];
+
+      //creating a ticket
       const ticket = await TicketModel.create(ticketData);
       return ticket;
     } catch (error) {
@@ -73,15 +89,31 @@ export class TicketsService {
   public async updateTicketById(ticketId: string, updateData: UpdateTicket, user: User): Promise<Ticket> {
     try {
       const ticket = await TicketModel.findById(ticketId);
-      if (ticket) {
-        if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
-          throw new HttpException(403, 'Unauthorized Access');
-        }
-        const updatedTicket = await TicketModel.findByIdAndUpdate(ticketId, { $set: updateData }, { new: true }).populate('comments');
-        return updatedTicket;
+      if (!ticket) {
+        throw new HttpException(404, 'Ticket not found');
+      }
+      if (ticket.createdBy.toString() !== user._id.toString() && user.role === 'user') {
+        throw new HttpException(403, 'Unauthorized Access');
       }
 
-      throw new HttpException(404, 'Ticket not found');
+      // logging the ticket updation
+      const multiFieldUpdateData = {
+        userId: user._id,
+        updateType: 'updateTicket',
+        updateFields: updateData,
+      };
+
+      const logData = await TicketLogModel.create(multiFieldUpdateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
+      }
+
+      const updatedTicket = await TicketModel.findByIdAndUpdate(
+        ticketId,
+        { $set: updateData, $push: { history: logData._id } },
+        { new: true },
+      ).populate('comments');
+      return updatedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to update ticket with ID ${ticketId}: ${error.message}`);
     }
@@ -89,9 +121,26 @@ export class TicketsService {
 
   public async assignTicket(ticketId: string, user: User): Promise<Ticket> {
     try {
+      // logging the ticket assigning
+      const updateData = {
+        userId: user._id,
+        updateType: 'assignTicket',
+        updateFields: {
+          assignedAgent: user._id,
+          status: 'inProgress',
+        },
+      };
+
+      const logData = await TicketLogModel.create(updateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
+      }
+
+      //assigining ticket
+
       const ticket = await TicketModel.findOneAndUpdate(
         { _id: ticketId, assignedAgent: null, status: 'open' },
-        { $set: { assignedAgent: user._id, status: 'inProgress' } },
+        { $set: { assignedAgent: user._id, status: 'inProgress' }, $push: { history: logData._id } },
         { new: true },
       );
 
@@ -116,40 +165,77 @@ export class TicketsService {
     }
   }
 
-  public async changeAgent(ticketId: string, newAgentId: string, agentId: string): Promise<Ticket> {
+  public async changeAgent(ticketId: string, newAgentId: string, user: User): Promise<Ticket> {
     try {
-      const ticket = await TicketModel.findOneAndUpdate(
-        { _id: ticketId, assignedAgent: agentId },
-        { $set: { assignedAgent: newAgentId } },
+      if (user.role == 'support') {
+        const ticket = await TicketModel.findOne({ _id: ticketId, assignedAgent: user._id });
+        if (!ticket) {
+          throw new HttpException(404, 'Ticket not found or Unauthorized access');
+        }
+      }
+      // logging the ticket assigning
+      const updateData = {
+        userId: user._id,
+        updateType: 'reassignTicket',
+        updateFields: {
+          assignedAgent: newAgentId,
+        },
+      };
+
+      const logData = await TicketLogModel.create(updateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
+      }
+
+      //reassigining ticket
+      const updatedTicket = await TicketModel.findOneAndUpdate(
+        { _id: ticketId },
+        { $set: { assignedAgent: newAgentId }, $push: { history: logData._id } },
         { new: true },
-      );
-      if (!ticket) {
+      ).populate(['createdBy', 'assignedAgent']);
+
+      if (!updatedTicket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
       }
-      console.log('new ticket ', ticket);
-      await ticket.populate('createdBy');
-      await ticket.populate('assignedAgent');
-      return ticket;
+
+      return updatedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to reassign ticket with ID ${ticketId}: ${error.message}`);
     }
   }
 
-  public async closeTicket(ticketId: string, agentId: string): Promise<Ticket> {
+  public async closeTicket(ticketId: string, user: User): Promise<Ticket> {
     try {
-      const ticket = await TicketModel.findById(ticketId);
-      if (!ticket) {
-        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      if (user.role == 'support') {
+        const ticket = await TicketModel.findOne({ _id: ticketId, assignedAgent: user._id });
+        if (!ticket) {
+          throw new HttpException(404, 'Ticket not found or Unauthorized access');
+        }
+      }
+      // logging the ticket closing
+      const updateData = {
+        userId: user._id,
+        updateType: 'closeTicket',
+        updateFields: {
+          status: 'closed',
+        },
+      };
+
+      const logData = await TicketLogModel.create(updateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
       }
 
-      if (ticket.assignedAgent.toString() != agentId.toString()) {
-        throw new HttpException(403, 'Unauthorized Operation');
+      //closing ticket
+      const closedTicket = await TicketModel.findOneAndUpdate(
+        { _id: ticketId },
+        { $set: { status: 'closed' }, $push: { history: logData._id } },
+        { new: true },
+      ).populate(['createdBy', 'comments']);
+
+      if (!closedTicket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found or Unauthorized Agent`);
       }
-
-      ticket.status = 'closed';
-
-      const closedTicket = await ticket.save();
-      await closedTicket.populate(['createdBy', 'comments']);
 
       return closedTicket;
     } catch (error) {
@@ -159,6 +245,22 @@ export class TicketsService {
 
   public async createComment(ticketId: string, commentData: string, user: User): Promise<Ticket> {
     try {
+      // logging the comment creation
+      const updateData = {
+        userId: user._id,
+        updateType: 'comment',
+        updateFields: {
+          comment: commentData,
+        },
+      };
+
+      const logData = await TicketLogModel.create(updateData);
+      if (!logData) {
+        throw new HttpException(500, 'Failed to create the log');
+      }
+
+      //creating comment
+
       const ticket = await TicketModel.findById(ticketId);
       if (!ticket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
@@ -179,6 +281,7 @@ export class TicketsService {
       const comment = await CommentModel.create({ text: commentData, author: user._id });
 
       ticket.comments.push(comment._id);
+      ticket.history.push(logData._id);
       await ticket.save();
       await ticket.populate(['comments', 'createdBy', 'assignedAgent']);
       return ticket;
@@ -222,12 +325,35 @@ export class TicketsService {
       }
 
       await CommentModel.deleteMany({ _id: { $in: ticket.comments } });
+      await TicketLogModel.deleteMany({ _id: { $in: ticket.history } });
 
       const deletedTicket = await TicketModel.findByIdAndDelete(ticketId).populate('createdBy');
 
       return deletedTicket;
     } catch (error) {
       throw new HttpException(500, `Failed to delete ticket with ID ${ticketId}: ${error.message}`);
+    }
+  }
+
+  public async getLogs(ticketId: string, user: User): Promise<TicketLog[]> {
+    try {
+      const ticket = await TicketModel.findById(ticketId).populate('history');
+
+      if (!ticket) {
+        throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
+      }
+
+      if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      if (user.role == 'user' && ticket.createdBy.toString() != user._id.toString()) {
+        throw new HttpException(403, 'Unauthorized Operation');
+      }
+
+      return ticket.history as TicketLog[];
+    } catch (error) {
+      throw new HttpException(500, `Failed to retrieve updates: ${error.message}`);
     }
   }
 }

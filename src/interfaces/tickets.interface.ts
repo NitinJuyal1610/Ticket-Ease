@@ -1,6 +1,7 @@
 import { Comment } from './comments.interface';
 import { Types } from 'mongoose';
 import { User } from './users.interface';
+import { TicketLog } from './ticketLog.interface';
 
 export interface Ticket {
   _id?: Types.ObjectId;
@@ -12,6 +13,7 @@ export interface Ticket {
   category: string;
   assignedAgent: Types.ObjectId | User;
   comments: Comment[] | Types.ObjectId[];
+  history: TicketLog[] | Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }

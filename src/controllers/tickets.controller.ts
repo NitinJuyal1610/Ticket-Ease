@@ -96,8 +96,8 @@ export class TicketController {
     try {
       const ticketId = req.params.id;
       const newAgentId = req.body.agentId;
-      const agentId = req.user._id;
-      const ticket = await this.ticket.changeAgent(ticketId, newAgentId, agentId);
+
+      const ticket = await this.ticket.changeAgent(ticketId, newAgentId, req.user);
 
       //email for prev agent
       await sendMail(req.user.email, 'Ticket Reassigned Successfully', `<h5>Successfully Reassigned Ticket with Id: <p>${ticket._id}</p><h5>`);
@@ -125,8 +125,8 @@ export class TicketController {
   public resolveTicket = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const ticketId = req.params.id;
-      const agentId = req.user._id;
-      const ticket: Ticket = await this.ticket.closeTicket(ticketId, agentId);
+
+      const ticket: Ticket = await this.ticket.closeTicket(ticketId, req.user);
       //email for support agent
       await sendMail(req.user.email, 'Ticket Closed', `<h5>Successfully Closed Ticket with Id: <p>${ticket._id}</p>!<h5>`);
 
@@ -192,6 +192,16 @@ export class TicketController {
       await sendMail(req.user.email, 'Ticket Deleted', `<h5> Ticket with Id: <p>${ticket._id}</p> Deleted <h5>`);
 
       res.status(200).json({ data: ticket, message: 'Ticket deleted' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getTicketLogs = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const ticketId = req.params.id;
+      const history = await this.ticket.getLogs(ticketId, req.user);
+      res.status(200).json({ data: history, message: 'Ticket history' });
     } catch (error) {
       next(error);
     }

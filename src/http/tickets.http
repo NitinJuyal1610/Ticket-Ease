@@ -11,7 +11,7 @@ GET {{baseURL}}/tickets/claimed
 
 ###
 # Find Ticket By Id (User & Support)
-GET {{ baseURL }}/tickets/64a91eddee4c35298bbb9c34
+GET {{ baseURL }}/tickets/64aeb13d6c12c7a423cc2e51
 
 ###
 # Create Ticket (User)
@@ -21,13 +21,13 @@ Content-Type: application/json
 {
     "title": "Buggy application ",
     "description": "Lot of Lag while rendering",
-    "priority":"high",
+    "priority":"low",
     "category":"Performance Problem"
 }
 
 ###
 # Modify Ticket By Id (User)
-PUT {{ baseURL }}/tickets/64ae590e34b8c8f4fce50364
+PUT {{ baseURL }}/tickets/64aeb13d6c12c7a423cc2e51
 Content-Type: application/json
 
 {
@@ -36,13 +36,13 @@ Content-Type: application/json
 
 ###
 #Claim a Ticket by Id (Support)
-PUT {{baseURL}}/tickets/claim/64ae5f5a9814db50b61d5bf2
+PUT {{baseURL}}/tickets/claim/64aeb13d6c12c7a423cc2e51
 Content-Type: application/json
 
 
 ###
 #Reassign a Ticket (Support)
-PUT {{baseURL}}/tickets/64ae590e34b8c8f4fce50364/reassign
+PUT {{baseURL}}/tickets/64aeb13d6c12c7a423cc2e51/reassign
 Content-Type: application/json
 
 {
@@ -52,13 +52,13 @@ Content-Type: application/json
 
 ###
 #Close a ticket (Support)
-PUT {{baseURL}}/tickets/64ae5f5a9814db50b61d5bf2/resolve
+PUT {{baseURL}}/tickets/64aeb13d6c12c7a423cc2e51/resolve
 Content-Type: application/json
 
 
 ###
 # Add Comment (User & Support)
-POST {{baseURL}}/tickets/comment/64ae5f5a9814db50b61d5bf2
+POST {{baseURL}}/tickets/comment/64aeb13d6c12c7a423cc2e51
 Content-Type: application/json
 
 {
@@ -71,5 +71,11 @@ GET {{baseURL}}/tickets/comments/64ae5f5a9814db50b61d5bf2
 Content-Type: application/json
 
 ###
+# Get Ticket History (User & Support)
+GET {{baseURL}}/tickets/history/64aeb13d6c12c7a423cc2e51
+
+###
 # Delete Ticket (Support)
-DELETE {{ baseURL }}/tickets/64ae5f5a9814db50b61d5bf2
+DELETE {{ baseURL }}/tickets/64aeb13d6c12c7a423cc2e51
+
+

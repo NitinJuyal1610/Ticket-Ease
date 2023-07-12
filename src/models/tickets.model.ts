@@ -42,6 +42,15 @@ const TicketSchema: Schema = new Schema(
       ],
       default: [],
     },
+    history: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: 'TicketLog',
+        },
+      ],
+      default: [],
+    },
   },
   { timestamps: true },
 );
