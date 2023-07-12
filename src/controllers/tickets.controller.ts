@@ -184,7 +184,7 @@ export class TicketController {
         await sendMail(
           ticket.createdBy.email,
           'Ticket Deleted',
-          `<h5>Ticket with Id: <p>${ticket._id}</p> Deleted admin/agent with email ${req.user.email} <h5>`,
+          `<h5>Ticket with Id: <p>${ticket._id}</p> Deleted by the admin/agent with email ${req.user.email} <h5>`,
         );
       }
 
