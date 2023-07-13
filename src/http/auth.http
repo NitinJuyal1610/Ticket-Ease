@@ -18,7 +18,7 @@ POST {{ baseURL }}/login
 Content-Type: application/json
 
 {
-    "email": "njtesting123@gmail.com",
+    "email": "kigofon434@nasskar.com",
     "password": "password1212",
     "role":"support"
 }

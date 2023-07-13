@@ -36,7 +36,7 @@ Content-Type: application/json
 
 ###
 #Claim a Ticket by Id (Support)
-PUT {{baseURL}}/tickets/claim/64aeb13d6c12c7a423cc2e51
+PUT {{baseURL}}/tickets/claim/64afe87d2adc7986bbf5a176
 Content-Type: application/json
 
 
@@ -52,17 +52,17 @@ Content-Type: application/json
 
 ###
 #Close a ticket (Support)
-PUT {{baseURL}}/tickets/64aeb13d6c12c7a423cc2e51/resolve
+PUT {{baseURL}}/tickets/64afe87d2adc7986bbf5a176/resolve
 Content-Type: application/json
 
 
 ###
 # Add Comment (User & Support)
-POST {{baseURL}}/tickets/comment/64aeb13d6c12c7a423cc2e51
+POST {{baseURL}}/tickets/comment/64afe87d2adc7986bbf5a176
 Content-Type: application/json
 
 {
-  "text":"Lol! it can be fixed easily."
+  "text":"I think it can be fixed easily."
 }
 
 ###
@@ -72,10 +72,10 @@ Content-Type: application/json
 
 ###
 # Get Ticket History (User & Support)
-GET {{baseURL}}/tickets/history/64aeb13d6c12c7a423cc2e51
+GET {{baseURL}}/tickets/history/64afe87d2adc7986bbf5a176
 
 ###
 # Delete Ticket (Support)
-DELETE {{ baseURL }}/tickets/64aeb13d6c12c7a423cc2e51
+DELETE {{ baseURL }}/tickets/64afe87d2adc7986bbf5a176
 
 

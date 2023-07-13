@@ -142,13 +142,12 @@ export class TicketsService {
         { _id: ticketId, assignedAgent: null, status: 'open' },
         { $set: { assignedAgent: user._id, status: 'inProgress' }, $push: { history: logData._id } },
         { new: true },
-      );
+      ).populate({ path: 'createdBy', select: 'email' });
 
       if (!ticket) {
-        throw new HttpException(404, 'Ticket not found');
+        throw new HttpException(404, 'Ticket not found/Ticket already assigned');
       }
 
-      await ticket.populate('createdBy');
       console.log('ticket update status -o- ', ticket);
       return ticket;
     } catch (error) {
@@ -192,7 +191,10 @@ export class TicketsService {
         { _id: ticketId },
         { $set: { assignedAgent: newAgentId }, $push: { history: logData._id } },
         { new: true },
-      ).populate(['createdBy', 'assignedAgent']);
+      ).populate([
+        { path: 'createdBy', select: 'email' },
+        { path: 'assignedAgent', select: 'email' },
+      ]);
 
       if (!updatedTicket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found`);
@@ -231,7 +233,10 @@ export class TicketsService {
         { _id: ticketId },
         { $set: { status: 'closed' }, $push: { history: logData._id } },
         { new: true },
-      ).populate(['createdBy', 'comments']);
+      ).populate([
+        { path: 'createdBy', select: 'email' },
+        { path: 'assignedAgent', select: 'email' },
+      ]);
 
       if (!closedTicket) {
         throw new HttpException(404, `Ticket with the id ${ticketId} not found or Unauthorized Agent`);
@@ -283,7 +288,7 @@ export class TicketsService {
       ticket.comments.push(comment._id);
       ticket.history.push(logData._id);
       await ticket.save();
-      await ticket.populate(['comments', 'createdBy', 'assignedAgent']);
+      await ticket.populate(['comments', { path: 'createdBy', select: 'email' }, { path: 'assignedAgent', select: 'email' }]);
       return ticket;
     } catch (error) {
       throw new HttpException(500, `Failed to create comment: ${error.message}`);
@@ -327,7 +332,7 @@ export class TicketsService {
       await CommentModel.deleteMany({ _id: { $in: ticket.comments } });
       await TicketLogModel.deleteMany({ _id: { $in: ticket.history } });
 
-      const deletedTicket = await TicketModel.findByIdAndDelete(ticketId).populate('createdBy');
+      const deletedTicket = await TicketModel.findByIdAndDelete(ticketId).populate({ path: 'createdBy', select: 'email' });
 
       return deletedTicket;
     } catch (error) {
