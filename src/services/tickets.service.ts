@@ -37,8 +37,6 @@ export class TicketsService {
       if (category) filter['category'] = category;
 
       if (sortBy) sorter[sortBy] = sortOrder;
-
-      console.log(filter);
       tickets = await TicketModel.find(filter).populate('comments').sort(sorter);
       return tickets;
     } catch (error) {
