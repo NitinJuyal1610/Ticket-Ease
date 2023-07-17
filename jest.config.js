@@ -8,5 +8,9 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  testMatch: ['<rootDir>/src/test/**/*.test.ts'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/src' }),
+  resetMocks: true,
+  restoreMocks: true,
+  clearMocks: true,
 };

@@ -26,14 +26,10 @@ export class App {
     this.port = PORT || 3000;
 
     this.connectToDatabase();
-    console.log('Connected to DB');
     this.initializeMiddlewares();
-    console.log('Initialized Middlewares');
     this.initializeRoutes(routes);
-    console.log('Initialized Routes');
     this.initializeSwagger();
     this.initializeErrorHandling();
-    console.log('Initialized Error Handler');
   }
 
   public listen() {
@@ -54,11 +50,13 @@ export class App {
       set('debug', true);
     }
 
-    try {
-      await connect(dbConnection.url);
-      console.log('connection to db successfull');
-    } catch (error) {
-      throw new Error(error);
+    if (this.env !== 'test') {
+      try {
+        await connect(dbConnection.url);
+        console.log('connection to db successfull');
+      } catch (error) {
+        throw new Error(error);
+      }
     }
   }
 
