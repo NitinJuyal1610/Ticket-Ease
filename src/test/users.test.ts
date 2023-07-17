@@ -23,7 +23,6 @@ describe('Testing Users', () => {
   const usersRoute = new UserRoute();
   let request: supertest.SuperTest<supertest.Test>;
   beforeEach(() => {
-    const usersRoute = new UserRoute();
     const app = new App([usersRoute]);
     request = supertest(app.getServer());
   });

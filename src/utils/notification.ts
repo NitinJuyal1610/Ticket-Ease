@@ -20,4 +20,5 @@ export const sendMail = async (to: string, subject: string, html: string) => {
     subject: subject,
     html: html,
   });
+  return true;
 };
