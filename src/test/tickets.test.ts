@@ -721,7 +721,131 @@ describe('Testing Tickets', () => {
           });
         });
       });
-      //test create comment
+      //---------------------------------------------------------------------------------------------------------------------//
+      describe('[POST]/tickets/comment/:id', () => {
+        const ticketData = {
+          //ticket data
+          title: 'hello',
+          description: 'world of coders',
+          priority: 'high',
+          category: 'Performance Problem',
+          createdBy: '60706478aad6c9ad19a31c22',
+        };
+
+        describe('when the user is not authenticated', () => {
+          it('should throw 404 error if token is missing', async () => {
+            //execute
+            const response = await request.post(`${ticketRoute.path}/comment/1`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Authentication token missing');
+          });
+
+          it('should throw 401 error if token is wrong', async () => {
+            //setup
+            const token = '21AOHO35EOFQO9U0AIABALBL';
+            //execute
+            const response = await request.post(`${ticketRoute.path}/comment/1`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(401);
+          });
+        });
+        describe('when the user is authenticated', () => {
+          it('should create a comment returning status 201', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //create ticket
+            const ticket = await TicketModel.create(ticketData);
+            await TicketModel.findByIdAndUpdate(ticket._id, {
+              $set: {
+                assignedAgent: '60706478aad6c9ad19a31c28',
+                status: 'inProgress',
+              },
+            });
+            //execute
+            const response = await request
+              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .send({ text: 'hello this is my comment' })
+              .set('Cookie', `Authorization=${token}`);
+            //assert
+
+            expect(response.status).toBe(201);
+            expect(response.body.message).toEqual('Ticket comment added');
+            expect(response.body.data.comments).toHaveLength(1);
+            expect(response.body.data.comments[0].text).toEqual('hello this is my comment');
+          });
+
+          it('should handle edge cases when creating comment', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c22',
+              email: 'testuser@email.com',
+              role: 'user',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c22' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //throw error when user create comment without any assigned agent
+            //create ticket
+            const ticket = await TicketModel.create(ticketData);
+
+            //execute
+            const response = await request
+              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .send({ text: 'hello this is my comment as user' })
+              .set('Cookie', `Authorization=${token}`);
+            //assert
+
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Ticket not yet assigned to an agent');
+
+            //unauthorized operation by support
+
+            //setup
+            const userData2: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token2 = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData2);
+
+            //assign different agent
+            await TicketModel.findByIdAndUpdate(ticket._id, {
+              $set: {
+                assignedAgent: '60706478aad6c9ad19a31c30',
+                status: 'inProgress',
+              },
+            });
+
+            //execute
+            const response2 = await request
+              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .send({ text: 'hello this is my comment as support' })
+              .set('Cookie', `Authorization=${token2}`);
+            //assert
+
+            expect(response2.status).toBe(403);
+            expect(response2.body.message).toEqual('Unauthorized Operation');
+          });
+        });
+      });
 
       //test delete ticket
     });
