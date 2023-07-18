@@ -135,7 +135,6 @@ export class TicketsService {
       throw new HttpException(404, 'Ticket not found/Ticket already assigned');
     }
 
-    console.log('ticket update status -o- ', ticket);
     return ticket;
   }
 

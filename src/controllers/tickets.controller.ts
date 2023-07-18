@@ -68,7 +68,7 @@ export class TicketController {
       //email for support agent
       await sendMail(req.user.email, 'Ticket Claimed', `<h5>Successfully Claimed Ticket with Id: <p>${ticket._id}</p>!<h5>`);
 
-      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+      if (ticket.createdBy && typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(
           ticket.createdBy.email,
           'Ticket Assigned',
@@ -103,7 +103,7 @@ export class TicketController {
       await sendMail(req.user.email, 'Ticket Reassigned Successfully', `<h5>Successfully Reassigned Ticket with Id: <p>${ticket._id}</p><h5>`);
 
       //email for new agent
-      if (typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
+      if (ticket.assignedAgent && typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
         await sendMail(
           ticket.assignedAgent.email,
           'Ticket Assigned',
