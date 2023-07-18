@@ -600,14 +600,130 @@ describe('Testing Tickets', () => {
           });
         });
       });
+
+      //-----------------------------------------------------------------------------------------------//
+      describe('[PUT]/tickets/:id/resolve', () => {
+        const ticketData = {
+          //ticket data
+          title: 'hello',
+          description: 'world of coders',
+          priority: 'high',
+          category: 'Performance Problem',
+          createdBy: '60706478aad6c9ad19a31c22',
+        };
+
+        describe('when the user is not authenticated', () => {
+          it('should throw 404 error if token is missing', async () => {
+            //execute
+            const response = await request.put(`${ticketRoute.path}/1/resolve`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Authentication token missing');
+          });
+
+          it('should throw 401 error if token is wrong', async () => {
+            //setup
+            const token = '21AOHO35EOFQO9U0AIABALBL';
+            //execute
+            const response = await request.put(`${ticketRoute.path}/2/resolve`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(401);
+          });
+        });
+        describe('when the user is authenticated', () => {
+          it('should resolve the ticket with status 201', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+            const mockResolveData = {
+              _id: 'qpwoeiruty',
+              title: 'hello',
+              description: 'world',
+              status: 'open',
+              priority: 'high',
+              createdBy: '60706478aad6c9ad19a31c22',
+              category: 'Performance Problem',
+              assignedAgent: '60706478aad6c9ad19a31c28',
+              comments: [],
+              history: ['ajpfaj'],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //resolve mock
+            mockResolveData.status = 'closed';
+            const ticketId = '60706578aa96c9ad19a36221';
+            //mock for resolving & checking
+            jest.spyOn(TicketModel, 'findOne').mockResolvedValue(ticketData);
+            const findOneAndUpdateMock = jest.spyOn(TicketModel, 'findOneAndUpdate');
+            findOneAndUpdateMock.mockReturnValue({
+              populate: jest.fn().mockResolvedValue(mockResolveData),
+            } as any);
+
+            //execute
+            const response = await request.put(`${ticketRoute.path}/${ticketId}/resolve`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(201);
+            expect(response.body.message).toEqual('Ticket resolved');
+            expect(response.body.data.status).toEqual('closed');
+          });
+
+          it('should throw an error if ticket is not assigned to agent performing operation', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+            const mockResolveData = {
+              _id: 'qpwoeiruty',
+              title: 'hello',
+              description: 'world',
+              status: 'open',
+              priority: 'high',
+              createdBy: '60706478aad6c9ad19a31c22',
+              category: 'Performance Problem',
+              assignedAgent: '60706478aad6c9ad19a31c28',
+              comments: [],
+              history: ['ajpfaj'],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //resolve mock
+            mockResolveData.status = 'closed';
+            const ticketId = '60706578aa96c9ad19a36221';
+            //mock for resolving & checking
+            jest.spyOn(TicketModel, 'findOne').mockResolvedValue(null);
+            const findOneAndUpdateMock = jest.spyOn(TicketModel, 'findOneAndUpdate');
+            findOneAndUpdateMock.mockReturnValue({
+              populate: jest.fn().mockResolvedValue(mockResolveData),
+            } as any);
+
+            //execute
+            const response = await request.put(`${ticketRoute.path}/${ticketId}/resolve`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Ticket not found or Unauthorized access');
+          });
+        });
+      });
+      //test create comment
+
+      //test delete ticket
     });
-
-    //test change agent
-
-    //test close ticket
-
-    //test create comment
-
-    //test delete ticket
   });
 });

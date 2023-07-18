@@ -130,7 +130,7 @@ export class TicketController {
       //email for support agent
       await sendMail(req.user.email, 'Ticket Closed', `<h5>Successfully Closed Ticket with Id: <p>${ticket._id}</p>!<h5>`);
 
-      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+      if (ticket.createdBy && typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(
           ticket.createdBy.email,
           'Ticket Closed',
@@ -150,11 +150,11 @@ export class TicketController {
       const ticket = await this.ticket.createComment(ticketId, comment, req.user);
 
       //email for user/owner of ticket
-      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+      if (ticket.createdBy && typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(ticket.createdBy.email, 'New Comment Added', `<h5>New Comment Added on the Ticket with Id: <p>${ticket._id}</p><h5>`);
       }
       //email for support agent
-      if (typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
+      if (ticket.assignedAgent && typeof ticket.assignedAgent == 'object' && 'email' in ticket.assignedAgent) {
         await sendMail(ticket.assignedAgent.email, 'New Comment Added', `<h5>New Comment Added on the Ticket with Id: <p>${ticket._id}</p> <h5>`);
       }
       res.status(201).json({ data: ticket, message: 'Ticket comment added' });
