@@ -487,6 +487,119 @@ describe('Testing Tickets', () => {
           expect(response.body.message).toEqual('Ticket not found/Ticket already assigned');
         });
       });
+
+      //-------------------------------------------------------------------------------------------//
+      describe('[PUT]/tickets/:id/reassign', () => {
+        const ticketData = {
+          //ticket data
+          title: 'hello',
+          description: 'world of coders',
+          priority: 'high',
+          category: 'Performance Problem',
+          createdBy: '60706478aad6c9ad19a31c22',
+        };
+
+        describe('when the user is not authenticated', () => {
+          it('should throw 404 error if token is missing', async () => {
+            //execute
+            const response = await request.put(`${ticketRoute.path}/1/reassign`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Authentication token missing');
+          });
+
+          it('should throw 401 error if token is wrong', async () => {
+            //setup
+            const token = '21AOHO35EOFQO9U0AIABALBL';
+            //execute
+            const response = await request.put(`${ticketRoute.path}/2/reassign`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(401);
+          });
+        });
+        describe('when the user is authenticated', () => {
+          it('should reassign the ticket with status 201', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+            const mockReassignData = {
+              _id: 'qpwoeiruty',
+              title: 'hello',
+              description: 'world',
+              status: 'open',
+              priority: 'high',
+              createdBy: '60706478aad6c9ad19a31c22',
+              category: 'Performance Problem',
+              assignedAgent: '60706478aad6c9ad19a31c28',
+              comments: [],
+              history: ['ajpfaj'],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            const agentId = '60706478aad6c9ad19a31c21';
+            //reassign mock
+            mockReassignData.assignedAgent = agentId;
+            const ticketId = '60706578aa96c9ad19a36221';
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //mock for reassign
+            jest.spyOn(TicketModel, 'findOne').mockResolvedValue(ticketData);
+            const findOneAndUpdateMock = jest.spyOn(TicketModel, 'findOneAndUpdate');
+            findOneAndUpdateMock.mockReturnValue({
+              populate: jest.fn().mockResolvedValue(mockReassignData),
+            } as any);
+
+            //execute
+            const response = await request
+              .put(`${ticketRoute.path}/${ticketId}/reassign`)
+              .send({ agentId: agentId })
+              .set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(201);
+            expect(response.body.message).toEqual('Ticket reassign successfull');
+            expect(response.body.data.assignedAgent).toEqual(agentId);
+          });
+
+          it('should throw 404 error when ticket is not found or not assigned to agent', async () => {
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            const agentId = '60706478aad6c9ad19a31c21';
+            //reassign mock
+            const ticketId = '60706578aa96c9ad19a36221';
+
+            //mock for reassign
+            jest.spyOn(TicketModel, 'findOne').mockResolvedValue(null);
+            const findOneAndUpdateMock = jest.spyOn(TicketModel, 'findOneAndUpdate');
+            findOneAndUpdateMock.mockReturnValue({
+              populate: jest.fn().mockResolvedValue(null),
+            } as any);
+
+            //execute
+            const response = await request
+              .put(`${ticketRoute.path}/${ticketId}/reassign`)
+              .send({ agentId: agentId })
+              .set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Ticket not found or Unauthorized access');
+          });
+        });
+      });
     });
 
     //test change agent

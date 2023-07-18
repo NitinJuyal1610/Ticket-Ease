@@ -149,6 +149,7 @@ export class TicketsService {
   public async changeAgent(ticketId: string, newAgentId: string, user: User): Promise<Ticket> {
     if (user.role == 'support') {
       const ticket = await TicketModel.findOne({ _id: ticketId, assignedAgent: user._id });
+
       if (!ticket) {
         throw new HttpException(404, 'Ticket not found or Unauthorized access');
       }

@@ -112,7 +112,7 @@ export class TicketController {
       }
 
       //email for user
-      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+      if (ticket.createdBy && typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(ticket.createdBy.email, 'New Agent Assigned', `<h5>Ticket Assigned to a new Agent<h5>`);
       }
 
