@@ -5,6 +5,7 @@ import supertest from 'supertest';
 import { App } from '@/app';
 import { CreateUserDto } from '@dtos/users.dto';
 import { TicketRoute } from '@/routes/tickets.route';
+import { AuthRoute } from '@/routes/auth.route';
 import { TicketModel } from '@/models/tickets.model';
 import { UserModel } from '@/models/users.model';
 import { Ticket } from '@/interfaces/tickets.interface';
@@ -26,11 +27,16 @@ afterAll(async () => {
 
 describe('Testing Auth', () => {
   const ticketRoute = new TicketRoute();
+  const authRoute = new AuthRoute();
   let request: supertest.SuperTest<supertest.Test>;
   beforeEach(() => {
     const app = new App([ticketRoute]);
     request = supertest(app.getServer());
+
+    //mocking mailing service
     jest.spyOn(notificationUtils, 'sendMail').mockResolvedValue(true);
+
+    //mocking login service
   });
   describe('[GET]/tickets', () => {
     const ticketData = [
@@ -46,8 +52,23 @@ describe('Testing Auth', () => {
         assignedAgent: '123',
         comments: [],
         history: ['ajpfaj'],
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        //ticket data
+        _id: 'qpuytdhjpo',
+        title: 'hello1',
+        description: 'world123',
+        status: 'inProgress',
+        priority: 'low',
+        createdBy: '125',
+        category: 'Performance Problem',
+        assignedAgent: '122',
+        comments: [],
+        history: ['ajpzsaj'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ];
     jest.spyOn(TicketModel, 'find').mockResolvedValue(ticketData);
@@ -60,7 +81,7 @@ describe('Testing Auth', () => {
         expect(response.body.message).toEqual('Authentication token missing');
       });
 
-      it('should throw 401 error if token is missing', async () => {
+      it('should throw 401 error if token is wrong', async () => {
         //setup
         const token = '21AOHO35EOFQO9U0AIABALBL';
         //execute
@@ -69,6 +90,33 @@ describe('Testing Auth', () => {
         expect(response.status).toBe(401);
       });
     });
-    // describe('when the user is authenticated', () => {});
+    describe('when the user is authenticated', () => {
+      it('should return all tickets with status 200', async () => {
+        //setup
+        const userData: User = {
+          _id: '60706478aad6c9ad19a31c22',
+          email: 'test@email.com',
+          role: 'user',
+          password: await bcrypt.hash('q1w2e3s4!', 10),
+        };
+        /*Fake login by generarting token and mocking auth middleware call to findUser*/
+        const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c22' }, SECRET_KEY, { expiresIn: '1d' });
+        jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+        //mock find function
+        const findMock = jest.spyOn(TicketModel, 'find');
+        findMock.mockReturnValue({
+          populate: jest.fn().mockReturnThis(),
+          sort: jest.fn().mockResolvedValue(ticketData),
+        } as any);
+        //execute
+        const response = await request.get(`${ticketRoute.path}`).set('Cookie', `Authorization=${token}`);
+        //assert
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual('tickets');
+        expect(response.body.data).toHaveLength(2);
+        expect(response.body.data).toEqual(ticketData);
+      });
+    });
   });
 });
