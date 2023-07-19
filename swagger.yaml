@@ -1,6 +1,11 @@
 tags:
+- name: auth
+  description: auth API
+- name: tickets
+  description: tickets API
 - name: users
   description: users API
+
 
 paths:
 # [GET] users
@@ -100,6 +105,20 @@ paths:
         500:
           description: 'Server Error'
 
+# [GET] users/agents
+  /users/agents:
+    get:
+      tags:
+      - users
+      summary: Find All Agents
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+
+
+
 # definitions
 definitions:
   users:
@@ -107,13 +126,110 @@ definitions:
     required:
         - email
         - password
+        - role
     properties:
       email:
         type: string
         description: user Email
+        example: nj@gmail.com
       password:
         type: string
         description: user Password
+        example: aohifha11389
+      role:
+        type: string
+        description: user Role
+        example: admin
+        enum: [admin, user, agent]
+  
+  tickets:
+    type: object
+    required:
+        - title
+        - description
+        - priority
+        - createdBy
+        - category
+    properties:
+      title:
+        type: string
+        description: ticket title
+        example: ticketTitle
+      description:
+        type: string
+        description: ticket description
+        example: ticketDescription
+      status:
+        type: string
+        description: ticket status
+        default: open
+        enum: [open, closed, inProgress]
+      priority:
+        type: string
+        description: ticket priority
+        enum: [low, medium, high]
+      createdBy:
+        type: string
+        description: ticket created by
+        format: uuid
+      category:
+        type: string
+        description: ticket category
+        enum: ['Login/Authentication Issue','UI/UX Feedback','Performance Problem','Broken Links','Error Messages','Compatibility Issue','Missing or Incorrect Data','Feature Malfunction','Spelling or Grammar Mistakes','General Inquiry','Other']
+      assignedAgent:
+        type: string
+        format: uuid
+        description: ticket assigned agent
+        default: null
+      comments:
+        type: array
+        description: ticket comments
+        items:
+          type: string
+          format: uuid
+        default: []
+      history:
+        type: array
+        description: ticket logs
+        items:
+          type: string
+          format: uuid
+        default: []
+    
+  ticketLogs:
+    type: object
+    required:
+      - updateType
+      - updateFields
+      - userId
+    properties:
+      updateType:
+        type: string
+        description: update type
+      updateFields:
+        type: object
+        description: update fields
+      userId:
+        type: string
+        format: uuid
+        description: User ID of the log creator
+    
+
+  comments:
+    type: object
+    required:
+      - text
+    properties:
+      text:
+        type: string
+        description: comment content
+        example: this is a demo comment
+      author:
+        type: string
+        format: uuid
+        description: User ID of the comment author
+    
+          
 
 schemes:
  - https

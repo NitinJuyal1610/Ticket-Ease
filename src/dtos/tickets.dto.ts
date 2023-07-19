@@ -11,6 +11,7 @@ const categories = [
   'Feature Malfunction',
   'Spelling or Grammar Mistakes',
   'General Inquiry',
+  'Other',
 ];
 
 // Data transfer object for creating ticket
