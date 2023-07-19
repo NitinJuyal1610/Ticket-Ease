@@ -7,7 +7,7 @@ POST {{ baseURL }}/signup
 Content-Type: application/json
 
 {
-    "email": "njtesting123@gmail.com",
+    "email": "njtesting13@gmail.com",
     "password": "password1212",
     "role":"support"
 }

@@ -32,10 +32,10 @@ export class AuthService {
 
   public async login(userData: User): Promise<{ cookie: string; findUser: User }> {
     const findUser: User = await UserModel.findOne({ email: userData.email, role: userData.role });
-    if (!findUser) throw new HttpException(409, `User with email ${userData.email} / role ${userData.role}  was not found`);
+    if (!findUser) throw new HttpException(404, `User with email ${userData.email} / role ${userData.role}  was not found`);
 
     const isPasswordMatching: boolean = await compare(userData.password, findUser.password);
-    if (!isPasswordMatching) throw new HttpException(409, 'Password is not matching');
+    if (!isPasswordMatching) throw new HttpException(401, 'Password is not matching');
 
     const tokenData = createToken(findUser);
     const cookie = createCookie(tokenData);

@@ -8,6 +8,77 @@ tags:
 
 
 paths:
+
+# [POST] signup
+  /signup:
+    post:
+      tags:
+      - auth
+      summary: create new account
+      parameters:
+      - name: body
+        in: body
+        description: user Data
+        required: true
+        schema:
+          $ref: '#/definitions/users'
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+# [POST] login
+  /login:
+    post:
+      tags:
+      - auth
+      summary: login to existing account
+      parameters:
+      - name: body
+        in: body
+        description: user Data
+        required: true
+        schema:
+          $ref: '#/definitions/users'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+# [POST] logout
+  /logout:
+    post:
+      tags:
+      - auth
+      summary: logout from existing account
+      parameters:
+      - name: body
+        in: body
+        description: user Data
+        required: true
+        schema:
+          $ref: '#/definitions/users'
+      responses:
+        200:
+          description: 'OK'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        500:
+          description: 'Server Error'
+
+
 # [GET] users
   /users:
     get:
@@ -116,7 +187,6 @@ paths:
           description: 'OK'
         500:
           description: 'Server Error'
-
 
 
 # definitions
