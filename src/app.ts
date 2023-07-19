@@ -79,11 +79,13 @@ export class App {
 
   private initializeSwagger() {
     const options = {
-      swaggerDefinition: {
+      failOnErrors: true,
+      definition: {
+        openapi: '3.0.0',
         info: {
           title: 'REST API',
           version: '1.0.0',
-          description: 'Example docs',
+          description: 'Ticketing RestApi docs',
         },
       },
       apis: ['swagger.yaml'],

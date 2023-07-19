@@ -1,3 +1,5 @@
+openapi: 3.0.0
+
 tags:
 - name: auth
   description: auth API
@@ -15,13 +17,12 @@ paths:
       tags:
       - auth
       summary: create new account
-      parameters:
-      - name: body
-        in: body
-        description: user Data
+      requestBody:
         required: true
-        schema:
-          $ref: '#/definitions/users'
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/users'
       responses:
         201:
           description: 'Created'
@@ -38,13 +39,12 @@ paths:
       tags:
       - auth
       summary: login to existing account
-      parameters:
-      - name: body
-        in: body
-        description: user Data
+      requestBody:
         required: true
-        schema:
-          $ref: '#/definitions/users'
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/users'
       responses:
         200:
           description: 'OK'
@@ -61,13 +61,6 @@ paths:
       tags:
       - auth
       summary: logout from existing account
-      parameters:
-      - name: body
-        in: body
-        description: user Data
-        required: true
-        schema:
-          $ref: '#/definitions/users'
       responses:
         200:
           description: 'OK'
@@ -78,6 +71,67 @@ paths:
         500:
           description: 'Server Error'
 
+# [GET] tickets
+  /tickets:
+    get:
+      tags:
+      - tickets
+      summary: Find All Tickets
+      responses:
+        200:
+          description: 'OK'
+        500:
+          description: 'Server Error'
+        404:
+          description: 'Not Found'
+        401:
+          description: 'Unauthorized'
+
+
+# [POST] tickets
+    post:
+      tags:
+      - tickets
+      summary: Create New Ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/tickets'
+      responses:
+        201:
+          description: 'Created'
+        400:
+          description: 'Bad Request'
+        409:
+          description: 'Conflict'
+        403:
+          description: 'Forbidden'
+        500:
+          description: 'Server Error'
+
+# [GET] tickets/id
+  /tickets/{id}:
+    get:
+      tags:
+      - tickets
+      summary: Find Ticket By Id
+      parameters:
+      - name: id
+        in: path
+        description: ticket Id
+        required: true
+      responses:
+        200:
+          description: 'OK'
+        404:
+          description: 'Not Found'
+        403:
+          description: 'Forbidden'
+        500:
+          description: 'Server Error'
+        
 
 # [GET] users
   /users:
@@ -96,13 +150,12 @@ paths:
       tags:
       - users
       summary: Add User
-      parameters:
-      - name: body
-        in: body
-        description: user Data
+      requestBody:
         required: true
-        schema:
-          $ref: '#/definitions/users'
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/users'
       responses:
         201:
           description: 'Created'
@@ -135,28 +188,30 @@ paths:
 # [PUT] users/id
     put:
       tags:
-      - users
+        - users
       summary: Update User By Id
       parameters:
-      - name: id
-        in: path
-        description: user Id
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      requestBody:
         required: true
-      - name: body
-        in: body
-        description: user Data
-        required: true
-        schema:
-          $ref: '#/definitions/users'
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/users'
       responses:
         200:
-          description: 'OK'
+          description: OK - User updated successfully
         400:
-          description: 'Bad Request'
+          description: Bad Request - Invalid input data
         409:
-          description: 'Conflict'
+          description: Conflict - User not found or update failed
         500:
-          description: 'Server Error'
+          description: Internal Server Error - Something went wrong on the server
 
 # [DELETE] users/id
     delete:
@@ -218,7 +273,6 @@ definitions:
         - title
         - description
         - priority
-        - createdBy
         - category
     properties:
       title:
@@ -229,77 +283,15 @@ definitions:
         type: string
         description: ticket description
         example: ticketDescription
-      status:
-        type: string
-        description: ticket status
-        default: open
-        enum: [open, closed, inProgress]
       priority:
         type: string
         description: ticket priority
         enum: [low, medium, high]
-      createdBy:
-        type: string
-        description: ticket created by
-        format: uuid
       category:
         type: string
         description: ticket category
         enum: ['Login/Authentication Issue','UI/UX Feedback','Performance Problem','Broken Links','Error Messages','Compatibility Issue','Missing or Incorrect Data','Feature Malfunction','Spelling or Grammar Mistakes','General Inquiry','Other']
-      assignedAgent:
-        type: string
-        format: uuid
-        description: ticket assigned agent
-        default: null
-      comments:
-        type: array
-        description: ticket comments
-        items:
-          type: string
-          format: uuid
-        default: []
-      history:
-        type: array
-        description: ticket logs
-        items:
-          type: string
-          format: uuid
-        default: []
-    
-  ticketLogs:
-    type: object
-    required:
-      - updateType
-      - updateFields
-      - userId
-    properties:
-      updateType:
-        type: string
-        description: update type
-      updateFields:
-        type: object
-        description: update fields
-      userId:
-        type: string
-        format: uuid
-        description: User ID of the log creator
-    
 
-  comments:
-    type: object
-    required:
-      - text
-    properties:
-      text:
-        type: string
-        description: comment content
-        example: this is a demo comment
-      author:
-        type: string
-        format: uuid
-        description: User ID of the comment author
-    
-          
 
 schemes:
  - https
