@@ -180,7 +180,7 @@ export class TicketController {
 
       //email for user/owner of ticket
       //agent and admin can delete the ticket
-      if (typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
+      if (ticket.createdBy && typeof ticket.createdBy == 'object' && 'email' in ticket.createdBy) {
         await sendMail(
           ticket.createdBy.email,
           'Ticket Deleted',

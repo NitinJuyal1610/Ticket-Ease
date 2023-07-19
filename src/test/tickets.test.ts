@@ -847,7 +847,115 @@ describe('Testing Tickets', () => {
         });
       });
 
-      //test delete ticket
+      //-------------------------------------------------------------------------------//
+
+      describe('[DELETE]/tickets/:id', () => {
+        const ticketData = {
+          //ticket data
+          title: 'hello',
+          description: 'world of coders',
+          priority: 'high',
+          category: 'Performance Problem',
+          createdBy: '60706478aad6c9ad19a31c22',
+        };
+
+        describe('when the user is not authenticated', () => {
+          it('should throw 404 error if token is missing', async () => {
+            //execute
+            const response = await request.delete(`${ticketRoute.path}/1`);
+            //assert
+            expect(response.status).toBe(404);
+            expect(response.body.message).toEqual('Authentication token missing');
+          });
+
+          it('should throw 401 error if token is wrong', async () => {
+            //setup
+            const token = '21AOHO35EOFQO9U0AIABALBL';
+            //execute
+            const response = await request.delete(`${ticketRoute.path}/1`).set('Cookie', `Authorization=${token}`);
+            //assert
+            expect(response.status).toBe(401);
+          });
+        });
+        describe('when the user is authenticated', () => {
+          it('should delete a ticket with an id returning status 201', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //create ticket
+            const ticket = await TicketModel.create(ticketData);
+            await TicketModel.findByIdAndUpdate(ticket._id, {
+              $set: {
+                assignedAgent: '60706478aad6c9ad19a31c28',
+                status: 'inProgress',
+              },
+            });
+            //execute
+            const response = await request.delete(`${ticketRoute.path}/${ticket._id}`).set('Cookie', `Authorization=${token}`);
+            //assert
+
+            expect(response.status).toBe(200);
+            expect(response.body.message).toEqual('Ticket deleted');
+          });
+
+          it('should handle edge cases when creating comment', async () => {
+            //setup
+            const userData: User = {
+              _id: '60706478aad6c9ad19a31c22',
+              email: 'testuser@email.com',
+              role: 'user',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token = await jwt.sign({ _id: '60706478aad6c9ad19a31c22' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData);
+
+            //throw error when user tries to delete the ticket
+
+            //create ticket
+            const ticket = await TicketModel.create(ticketData);
+
+            //execute
+            const response = await request.delete(`${ticketRoute.path}/${ticket._id}`).set('Cookie', `Authorization=${token}`);
+            //assert
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toEqual('Wrong authentication token or Not authorized');
+
+            //ticket not found
+
+            //setup
+            const userData2: User = {
+              _id: '60706478aad6c9ad19a31c28',
+              email: 'testsupport@email.com',
+              role: 'support',
+              password: await bcrypt.hash('q1w2e3s4!', 10),
+            };
+
+            /*Fake login by generarting token and mocking auth middleware call to findUser*/
+            const token2 = await jwt.sign({ _id: '60706478aad6c9ad19a31c28' }, SECRET_KEY, { expiresIn: '1d' });
+            jest.spyOn(UserModel, 'findById').mockResolvedValue(userData2);
+
+            //WRONG TICKET ID
+            const ticketId = '60706578aa96c9ad19a36222';
+            //execute
+            const response2 = await request.delete(`${ticketRoute.path}/${ticketId}`).set('Cookie', `Authorization=${token2}`);
+            //assert
+            expect(response2.status).toBe(404);
+            expect(response2.body.message).toEqual(`Ticket with the id ${ticketId} not found`);
+          });
+        });
+      });
     });
   });
 });
