@@ -14,15 +14,16 @@ services:
 
   server:
     container_name: server
+    image: ticketing_app_server
     build:
       context: ./
       dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: localhost
-      DB_PORT: 27017
-      DB_DATABASE: dev
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
     volumes:
       - ./:/app
       - /app/node_modules
@@ -40,9 +41,9 @@ services:
     ports:
       - "27017:27017"
     environment:
-      DB_HOST: localhost
-      DB_PORT: 27017
-      DB_DATABASE: dev
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
     networks:
       - backend
 
