@@ -246,7 +246,7 @@ export class TicketsService {
     }
 
     if (!ticket.assignedAgent) {
-      throw new HttpException(404, `Ticket not yet assigned to an agent`);
+      throw new HttpException(409, `Ticket not yet assigned to an agent`);
     }
 
     if (user.role == 'support' && ticket.assignedAgent.toString() != user._id.toString()) {

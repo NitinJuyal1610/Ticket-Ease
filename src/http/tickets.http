@@ -42,7 +42,7 @@ Content-Type: application/json
 
 ###
 #Reassign a Ticket (Support)
-PUT {{baseURL}}/tickets/64aeb13d6c12c7a423cc2e51/reassign
+PUT {{baseURL}}/tickets/reassign/64aeb13d6c12c7a423cc2e51
 Content-Type: application/json
 
 {
@@ -52,13 +52,13 @@ Content-Type: application/json
 
 ###
 #Close a ticket (Support)
-PUT {{baseURL}}/tickets/64afe87d2adc7986bbf5a176/resolve
+PUT {{baseURL}}/tickets/resolve/64afe87d2adc7986bbf5a176
 Content-Type: application/json
 
 
 ###
 # Add Comment (User & Support)
-POST {{baseURL}}/tickets/comment/64afe87d2adc7986bbf5a176
+POST {{baseURL}}/tickets/comments/64afe87d2adc7986bbf5a176
 Content-Type: application/json
 
 {

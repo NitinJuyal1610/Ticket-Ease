@@ -9,7 +9,6 @@ const categories = [
   'Compatibility Issue',
   'Missing or Incorrect Data',
   'Feature Malfunction',
-  'Spelling or Grammar Mistakes',
   'General Inquiry',
   'Other',
 ];

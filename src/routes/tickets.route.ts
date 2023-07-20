@@ -20,10 +20,10 @@ export class TicketRoute implements Routes {
     this.router.get(`${this.path}/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTicketById);
     this.router.get(`${this.path}/comments/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getCommentsById);
     this.router.get(`${this.path}/history/:id`, AuthMiddleware(['admin', 'support', 'user']), this.ticket.getTicketLogs);
-    this.router.put(`${this.path}/:id/reassign`, AuthMiddleware(['admin', 'support']), this.ticket.reassignTicket);
-    this.router.put(`${this.path}/:id/resolve`, AuthMiddleware(['admin', 'support']), this.ticket.resolveTicket);
+    this.router.put(`${this.path}/reassign/:id`, AuthMiddleware(['admin', 'support']), this.ticket.reassignTicket);
+    this.router.put(`${this.path}/resolve/:id`, AuthMiddleware(['admin', 'support']), this.ticket.resolveTicket);
     this.router.post(
-      `${this.path}/comment/:id`,
+      `${this.path}/comments/:id`,
       AuthMiddleware(['admin', 'support', 'user']),
       ValidationMiddleware(CreateCommentDto, true),
       this.ticket.addComment,

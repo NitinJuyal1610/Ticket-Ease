@@ -489,7 +489,7 @@ describe('Testing Tickets', () => {
       });
 
       //-------------------------------------------------------------------------------------------//
-      describe('[PUT]/tickets/:id/reassign', () => {
+      describe('[PUT]/tickets/reassign/:id', () => {
         const ticketData = {
           //ticket data
           title: 'hello',
@@ -502,7 +502,7 @@ describe('Testing Tickets', () => {
         describe('when the user is not authenticated', () => {
           it('should throw 404 error if token is missing', async () => {
             //execute
-            const response = await request.put(`${ticketRoute.path}/1/reassign`);
+            const response = await request.put(`${ticketRoute.path}/reassign/1`);
             //assert
             expect(response.status).toBe(404);
             expect(response.body.message).toEqual('Authentication token missing');
@@ -512,7 +512,7 @@ describe('Testing Tickets', () => {
             //setup
             const token = '21AOHO35EOFQO9U0AIABALBL';
             //execute
-            const response = await request.put(`${ticketRoute.path}/2/reassign`).set('Cookie', `Authorization=${token}`);
+            const response = await request.put(`${ticketRoute.path}/reassign/2`).set('Cookie', `Authorization=${token}`);
             //assert
             expect(response.status).toBe(401);
           });
@@ -558,7 +558,7 @@ describe('Testing Tickets', () => {
 
             //execute
             const response = await request
-              .put(`${ticketRoute.path}/${ticketId}/reassign`)
+              .put(`${ticketRoute.path}/reassign/${ticketId}`)
               .send({ agentId: agentId })
               .set('Cookie', `Authorization=${token}`);
             //assert
@@ -591,7 +591,7 @@ describe('Testing Tickets', () => {
 
             //execute
             const response = await request
-              .put(`${ticketRoute.path}/${ticketId}/reassign`)
+              .put(`${ticketRoute.path}/reassign/${ticketId}`)
               .send({ agentId: agentId })
               .set('Cookie', `Authorization=${token}`);
             //assert
@@ -602,7 +602,7 @@ describe('Testing Tickets', () => {
       });
 
       //-----------------------------------------------------------------------------------------------//
-      describe('[PUT]/tickets/:id/resolve', () => {
+      describe('[PUT]/tickets/resolve/:id', () => {
         const ticketData = {
           //ticket data
           title: 'hello',
@@ -615,7 +615,7 @@ describe('Testing Tickets', () => {
         describe('when the user is not authenticated', () => {
           it('should throw 404 error if token is missing', async () => {
             //execute
-            const response = await request.put(`${ticketRoute.path}/1/resolve`);
+            const response = await request.put(`${ticketRoute.path}/resolve/1`);
             //assert
             expect(response.status).toBe(404);
             expect(response.body.message).toEqual('Authentication token missing');
@@ -625,7 +625,7 @@ describe('Testing Tickets', () => {
             //setup
             const token = '21AOHO35EOFQO9U0AIABALBL';
             //execute
-            const response = await request.put(`${ticketRoute.path}/2/resolve`).set('Cookie', `Authorization=${token}`);
+            const response = await request.put(`${ticketRoute.path}/resolve/2`).set('Cookie', `Authorization=${token}`);
             //assert
             expect(response.status).toBe(401);
           });
@@ -669,7 +669,7 @@ describe('Testing Tickets', () => {
             } as any);
 
             //execute
-            const response = await request.put(`${ticketRoute.path}/${ticketId}/resolve`).set('Cookie', `Authorization=${token}`);
+            const response = await request.put(`${ticketRoute.path}/resolve/${ticketId}`).set('Cookie', `Authorization=${token}`);
             //assert
             expect(response.status).toBe(201);
             expect(response.body.message).toEqual('Ticket resolved');
@@ -714,7 +714,7 @@ describe('Testing Tickets', () => {
             } as any);
 
             //execute
-            const response = await request.put(`${ticketRoute.path}/${ticketId}/resolve`).set('Cookie', `Authorization=${token}`);
+            const response = await request.put(`${ticketRoute.path}/resolve/${ticketId}`).set('Cookie', `Authorization=${token}`);
             //assert
             expect(response.status).toBe(404);
             expect(response.body.message).toEqual('Ticket not found or Unauthorized access');
@@ -722,7 +722,7 @@ describe('Testing Tickets', () => {
         });
       });
       //---------------------------------------------------------------------------------------------------------------------//
-      describe('[POST]/tickets/comment/:id', () => {
+      describe('[POST]/tickets/comments/:id', () => {
         const ticketData = {
           //ticket data
           title: 'hello',
@@ -735,7 +735,7 @@ describe('Testing Tickets', () => {
         describe('when the user is not authenticated', () => {
           it('should throw 404 error if token is missing', async () => {
             //execute
-            const response = await request.post(`${ticketRoute.path}/comment/1`);
+            const response = await request.post(`${ticketRoute.path}/comments/1`);
             //assert
             expect(response.status).toBe(404);
             expect(response.body.message).toEqual('Authentication token missing');
@@ -745,7 +745,7 @@ describe('Testing Tickets', () => {
             //setup
             const token = '21AOHO35EOFQO9U0AIABALBL';
             //execute
-            const response = await request.post(`${ticketRoute.path}/comment/1`).set('Cookie', `Authorization=${token}`);
+            const response = await request.post(`${ticketRoute.path}/comments/1`).set('Cookie', `Authorization=${token}`);
             //assert
             expect(response.status).toBe(401);
           });
@@ -774,7 +774,7 @@ describe('Testing Tickets', () => {
             });
             //execute
             const response = await request
-              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .post(`${ticketRoute.path}/comments/${ticket._id}`)
               .send({ text: 'hello this is my comment' })
               .set('Cookie', `Authorization=${token}`);
             //assert
@@ -804,12 +804,12 @@ describe('Testing Tickets', () => {
 
             //execute
             const response = await request
-              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .post(`${ticketRoute.path}/comments/${ticket._id}`)
               .send({ text: 'hello this is my comment as user' })
               .set('Cookie', `Authorization=${token}`);
             //assert
 
-            expect(response.status).toBe(404);
+            expect(response.status).toBe(409);
             expect(response.body.message).toEqual('Ticket not yet assigned to an agent');
 
             //unauthorized operation by support
@@ -836,7 +836,7 @@ describe('Testing Tickets', () => {
 
             //execute
             const response2 = await request
-              .post(`${ticketRoute.path}/comment/${ticket._id}`)
+              .post(`${ticketRoute.path}/comments/${ticket._id}`)
               .send({ text: 'hello this is my comment as support' })
               .set('Cookie', `Authorization=${token2}`);
             //assert
