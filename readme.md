@@ -12,7 +12,7 @@
 7. [API Documentation](#api-documentation)
 
 ## Introduction 
-The Ticketing System REST API provides a powerful backend for managing customer support tickets, offering a seamless experience for users and support agents alike. Built with Node.js, TypeScript, and Express.js, this API enables efficient creation, updating, and tracking of support tickets, ensuring effective issue resolution and improved customer satisfaction.
+TicketEase provides a powerful backend for managing customer support tickets, offering a seamless experience for users and support agents alike. Built with Node.js, TypeScript, and Express.js, this API enables efficient creation, updating, and tracking of support tickets, ensuring effective issue resolution and improved customer satisfaction.
 
 ## Technologies Used
 - Node.js
